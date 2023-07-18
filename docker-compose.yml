@@ -1,0 +1,15 @@
+version: '3'
+services:
+  search: 
+    image: elasticsearch:7.17.10
+    environment:
+      - node.name=topboss
+      - cluster.initial_master_nodes=topboss
+    ports:
+      - 127.0.0.1:9200:9200
+    volumes:
+      - elastic:/usr/share/elasticsearch/data
+
+
+volumes:
+  elastic:

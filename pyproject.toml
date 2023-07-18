@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "phila-councilmatic"
+version = "0.0.1"
+description = "Philadelphia specific version of the datamade/councilmatic-starter-template"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "phila_councilmatic"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django-councilmatic = ">=2.5.4"
+psycopg = {extras = ["binary"], version = "^3.1.9"}
+pysolr = "^3.9.0"
+pupa = "^0.11.0"
+django-adv-cache-tag = "==1.1.2"
+django-haystack = {extras = ["elasticsearch"], version = "^3.2.1"}
+scraper-legistar = "^0.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
