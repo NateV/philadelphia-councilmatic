@@ -7,13 +7,13 @@
 OCD_CITY_COUNCIL_NAME = 'Philadelphia City Council'
 CITY_COUNCIL_NAME = 'Philadelphia City Council'
 OCD_JURISDICTION_IDS = ['ocd-jurisdiction/country:us/state:pa/place:philadelphia/government']
-LEGISLATIVE_SESSIONS = ['2007', '2011', '2015', '2019'] # the last one in this list should be the current legislative session
+LEGISLATIVE_SESSIONS = ['2020', '2021', '2022', '2023'] # the last one in this list should be the current legislative session
 CITY_NAME = 'Philadelphia'
 CITY_NAME_SHORT = 'Philadelphia'
 
 # VOCAB SETTINGS FOR FRONT-END DISPLAY
 CITY_VOCAB = {
-    'MUNICIPAL_DISTRICT': 'Ward',       # e.g. 'District'
+    'MUNICIPAL_DISTRICT': 'District',       # e.g. 'District'
     'SOURCE': 'Philadelphia City Clerk',
     'COUNCIL_MEMBER': 'Council Member',       # e.g. 'Council Member'
     'COUNCIL_MEMBERS': 'Council Members',      # e.g. 'Council Members'
@@ -37,7 +37,7 @@ SITE_META = {
     'twitter_creator': '',  # e.g. '@DataMadeCo'
 }
 
-LEGISTAR_URL = ''           # e.g. 'https://chicago.legistar.com/Legislation.aspx'
+LEGISTAR_URL = 'https://phila.legistar.com'           # e.g. 'https://chicago.legistar.com/Legislation.aspx'
 
 
 # this is for the boundaries of municipal districts, to add
@@ -84,7 +84,7 @@ CITY_COUNCIL_MEETING_NAME = 'City Council'
 # this is the name of the role of committee chairs, e.g. 'CHAIRPERSON' or 'Chair'
 # as stored in legistar
 # if this is set, committees will display chairs
-COMMITTEE_CHAIR_TITLE = 'Chairman'
+COMMITTEE_CHAIR_TITLE = 'Chair'
 
 # this is the anme of the role of committee members,
 # as stored in legistar
