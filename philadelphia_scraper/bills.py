@@ -47,7 +47,9 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                 action_details = action.get("Action\xa0Details")
                 tally_url = action_details.get('url') if action_details is not None else None
 
-                votes = (result, self.extractVotes(tally_url) if tally_url is not None else None)
+                # this ends up repeating (result, (result, {votes})). because extractVotes returns (result, {votes}). not sure we want to.
+                #votes = (result, self.extractVotes(tally_url) if tally_url is not None else None)
+                votes = self.extractVotes(tally_url) if tally_url is not None else None
             else:
                 print("tally is ", tally)
             
@@ -105,6 +107,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                         # Use 220733,  	9/22/2022 passed  2/16/2023 
                         # It had a vote.
 
+                        # TODO why is there an extra result in 'vote'
                         result, votes = vote
                         if result:
                             yield self.get_vote_event(bill_, act, votes, result)
@@ -112,7 +115,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                 
                 yield bill_
 
-    def get_vote_event(self, bill: Bill, act: Action, votes: List[Dict[str, str]], result: str) -> VoteEvent:
+    def get_vote_event(self, bill: Bill, act: Action, votes: List[Tuple[str, str]], result: str) -> VoteEvent:
         '''Make VoteEvent object from given Bill, action, votes and result.'''
         organization = "?"
         vote_event = VoteEvent(legislative_session=bill.legislative_session,
@@ -128,15 +131,16 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
         vote_event.add_source(legistar_web)
 
         for vote in votes:
-            raw_option = vote['VoteValueName'].lower()
+            raw_option = vote[0].lower()
 
+            # TODO not sure this happens in Philly
             if raw_option == 'suspended':
                 continue
 
             
             clean_option = self.VOTE_OPTIONS.get(raw_option, raw_option)
             #clean_option = raw_option
-            vote_event.vote(clean_option, vote['VotePersonName'].strip())
+            vote_event.vote(clean_option, vote[1].strip())
 
         return vote_event
 
