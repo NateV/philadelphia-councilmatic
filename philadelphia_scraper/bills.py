@@ -12,6 +12,10 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
     BASE_URL = "https://phila.legistar.com/"
     BASE_WEB_URL = "https://phila.legistar.com/"
     TIMEZONE = "US/Eastern"
+    VOTE_OPTIONS = {
+        "Ayes":"yes",
+        "Nayes":"no"
+            }
 
     def actions(self, matter_url: str) -> Generator[Tuple[Dict[str, str], Tuple[dict | None, dict | None]], None, None]:
         """
@@ -33,7 +37,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
             # there is an action detail url in Action\xa0Details
             # do i need that?
             bill_action["responsible_org"] = action.get('Action\xa0By','Ukn')
-            result = bill_action.get("Result")
+            result = action.get("Result")
 
             # TODO not sure what shows up in the Tally column.
             # Tally is a string, a count of votes, 13:1 or 11:3. It indicates there was a vote,
@@ -42,8 +46,8 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
             if tally is not None and tally != "":
                 action_details = action.get("Action\xa0Details")
                 tally_url = action_details.get('url') if action_details is not None else None
+
                 votes = (result, self.extractVotes(tally_url) if tally_url is not None else None)
-                breakpoint()
             else:
                 print("tally is ", tally)
             
@@ -87,7 +91,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                         from_organization={"name": "Philadelphia City Council"})
     
                 if bill.get('url') is not None:
-                    bill_.add_source(bill['url'],note="url")
+                    bill_.add_source(bill['url'],note="web")
                     for action, vote in self.actions(bill.get('url') or ""):
 
                         # Classification of an action describes the type of the action, like 'filing' or 'executive-signature'
@@ -119,10 +123,9 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                                result=result,
                                bill=bill)
 
-        legistar_web, legistar_api = [src['url'] for src in bill.sources]
+        legistar_web = [src['url'] for src in bill.sources]
 
         vote_event.add_source(legistar_web)
-        vote_event.add_source(legistar_api + '/histories')
 
         for vote in votes:
             raw_option = vote['VoteValueName'].lower()
@@ -131,8 +134,8 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                 continue
 
             
-            #clean_option = self.VOTE_OPTIONS.get(raw_option, raw_option)
-            clean_option = raw_option
+            clean_option = self.VOTE_OPTIONS.get(raw_option, raw_option)
+            #clean_option = raw_option
             vote_event.vote(clean_option, vote['VotePersonName'].strip())
 
         return vote_event
