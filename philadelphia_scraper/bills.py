@@ -44,9 +44,13 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
             # there is an action detail url in Action\xa0Details
             # do i need that?
             bill_action["responsible_org"] = action.get('Action\xa0By','Ukn')
+
+            # TODO Is this the right way to set the action's organization id?
+            # nope. doesn't even work!
+            # bill_action["organization_id"] = {'name': "Philadelphia City Council"}
+
             result = action.get("Result")
 
-            # TODO not sure what shows up in the Tally column.
             # Tally is a string, a count of votes, 13:1 or 11:3. It indicates there was a vote,
             # and that there are action details to extract.
             tally = action.get('Tally')
@@ -58,7 +62,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                 #votes = (result, self.extractVotes(tally_url) if tally_url is not None else None)
                 votes = self.extractVotes(tally_url) if tally_url is not None else None
             
-
+            print("done looking at those actions")
             yield bill_action, votes
 
     def clean_action_classification(self, action: str | None) -> str:
@@ -199,7 +203,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
 
                         act = bill_.add_action(action['action_description'],
                                               action['action_date'],
-                                              organization={'name': action['responsible_org']},
+                                              organization={'name': "Philadelphia City Council"},
                                               classification="")
     
                         # DOING what is 'vote'? Need to find a bill w/ votes to see if this works.
