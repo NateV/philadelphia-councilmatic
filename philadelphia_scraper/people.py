@@ -2,6 +2,21 @@ from pupa.scrape import Scraper
 from pupa.scrape import Person
 from pupa.scrape import Organization
 import lxml
+import re
+
+
+def strip_name_end(full_name):
+    """
+    Remove Jr, III, etc. from names, if present.
+    """
+    return re.sub(r"(, jr\.)|( i+ )", "", full_name, flags=re.I)
+
+def pad_list(short, long, pad_with):
+    """
+    pad the short list with the pad_with until its as long as the long list
+    """
+    pad = [pad_with for _ in range(0, len(long)-len(short))]
+    return short.extend(pad)
 
 class PhiladelphiaPersonScraper(Scraper):
 
@@ -41,12 +56,20 @@ class PhiladelphiaPersonScraper(Scraper):
         names = [el.text for el in doc.xpath(name_xpath)]
         districts = [el.text for el in doc.xpath(district_xpath)]
         titles = [el.text for el in doc.xpath(title_xpath)]
+        pad_list(titles, names, "")
+
         images = doc.xpath(pic_path)
+
 
         for url, name, district, title, pic in zip(urls, names, districts, titles, images):
 
+            name_parts = strip_name_end(name).split(" ")
+            last_name = name_parts[-1] 
+
             # Create legislator.
             person = Person(name, image=pic, district=district)
+            # I don't know what to do for names that have family name as not last.
+            person.family_name = last_name
 
             # Add membership on council.
             person.add_membership(council, role=title)
