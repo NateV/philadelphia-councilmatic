@@ -235,15 +235,21 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
             vote_event.add_source(legistar_web)
 
         for vote in votes:
+            # vote is a tuple of (how they voted, name of voter)
+            # like (yes, Councilmember GoofyPants)
+            # was the vote yes or no?
             raw_option = vote[0].lower()
+            voter = vote[1].replace("Councilmember","").strip()
 
             # TODO not sure this happens in Philly
             if raw_option == 'suspended':
                 continue
 
-            
+            # BUG the voter name is just the councilmember's last name, and 
+            # this becomes a pseudo-id that get s lookup up in 
+            # pupa/scrape/vote_event, but the last-name-only pseudo-id doens't work!
             clean_option = self.VOTE_OPTIONS.get(raw_option.lower(), raw_option.lower())
-            vote_event.vote(clean_option, vote[1].strip())
+            vote_event.vote(clean_option, voter)
 
         return vote_event
 
