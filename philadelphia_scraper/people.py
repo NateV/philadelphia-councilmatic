@@ -72,7 +72,9 @@ class PhiladelphiaPersonScraper(Scraper):
             person.family_name = last_name
 
             # Add membership on council.
-            person.add_membership(council, role=title)
+            # TODO the role needs to be one of the Posts added in __init__.py
+            breakpoint()
+            person.add_membership(council, role="District 1 Councilmember")
 
             # TODO Phila site's contact info is a little tedious to parse
 

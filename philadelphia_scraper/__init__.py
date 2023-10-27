@@ -36,7 +36,16 @@ class Philadelphia(Jurisdiction):
         # where label is a human-readable description of the post (eg "Ward 8 councilmember")
         # and role is the position type (eg councilmember, alderman, mayor...)
         # skip entirely if you're not writing a people scraper.
-        #org.add_post(label="position_description", role="position_type")
+        org.add_post(label="Council President", role="Council President")
+        for dist in range(1,11):
+            org.add_post(label=f"District {dist} Councilmember", role=f"District {dist} Councilmember")
+
+        # There are 6 at-larges - 
+        org.add_post(
+                label=f"Councilmember at Large",
+                role="Councilmember at Large",
+                maximum_memberships=6)
+
 
         #REQUIRED: yield the organization
         yield org

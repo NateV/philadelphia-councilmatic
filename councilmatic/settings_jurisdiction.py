@@ -14,7 +14,7 @@ CITY_NAME_SHORT = 'Philadelphia'
 # VOCAB SETTINGS FOR FRONT-END DISPLAY
 CITY_VOCAB = {
     'MUNICIPAL_DISTRICT': 'District',       # e.g. 'District'
-    'SOURCE': 'Philadelphia City Clerk',
+    'SOURCE': 'Philadelphia City Council',
     'COUNCIL_MEMBER': 'Council Member',       # e.g. 'Council Member'
     'COUNCIL_MEMBERS': 'Council Members',      # e.g. 'Council Members'
     'EVENTS': 'Meetings',               # label for the events listing, e.g. 'Events'
@@ -29,9 +29,9 @@ APP_NAME = 'city'
 
 # this is for populating meta tags
 SITE_META = {
-    'site_name' : '',       # e.g. 'Chicago Councilmatc'
-    'site_desc' : '',       # e.g. 'City Council, demystified. Keep tabs on Chicago legislation, aldermen, & meetings.'
-    'site_author' : '',     # e.g. 'DataMade'
+    'site_name' : 'Philadelphia Councilmatic',       # e.g. 'Chicago Councilmatc'
+    'site_desc' : 'Its a city council web-jawn',       # e.g. 'City Council, demystified. Keep tabs on Chicago legislation, aldermen, & meetings.'
+    'site_author' : 'Nate Vogel',     # e.g. 'DataMade'
     'site_url' : '',        # e.g. 'https://chicago.councilmatic.org'
     'twitter_site': '',     # e.g. '@DataMadeCo'
     'twitter_creator': '',  # e.g. '@DataMadeCo'
@@ -45,12 +45,12 @@ LEGISTAR_URL = 'https://phila.legistar.com'           # e.g. 'https://chicago.le
 # member listing. the boundary set should be the relevant
 # slug from the ocd api's boundary service
 # available boundary sets here: http://ocd.datamade.us/boundary-sets/
-BOUNDARY_SET = ''           # e.g. 'chicago-wards-2015'
+BOUNDARY_SET = 'philadelphia-districts-2023'           # e.g. 'chicago-wards-2015'
 
 # this is for configuring a map of council districts using data from the posts
 # set MAP_CONFIG = None to hide map
 MAP_CONFIG = {
-    'center': [41.8369, -87.6847],
+    'center': [39.952394, -75.163597],
     'zoom': 10,
     'color': "#54afe8",
     'highlight_color': "#C00000",
@@ -59,7 +59,7 @@ MAP_CONFIG = {
 
 FOOTER_CREDITS = [
     {
-        'name':     '', # e.g. 'DataMade'
+        'name':     'Nate Vogel', # e.g. 'DataMade'
         'url':      '', # e.g. 'http://datamade.us'
         'image':    '', # e.g. 'datamade-logo.png'
     },
