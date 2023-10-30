@@ -55,7 +55,8 @@ class PhiladelphiaPersonScraper(Scraper):
         # nb. the . at the start of each path makes the search relative.
         name_xpath = ".//h4[@class='x-face-title']/strong"
         # where the data is written on front and back of the card, pick one.
-        title_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/big/strong" # the 'Whip' or 'Leader' title, if any. 
+        council_title_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/strong/big" # the 'Whip' or 'Leader' title, if any. 
+        whip_title_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/big/strong" # the 'Whip' or 'Leader' title, if any. 
         district_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/strong" # district, not the 'Whip' or 
         link_xpath = ".//a[@class='x-face-button']/@href"
         pic_path = ".//div[@class='x-face-graphic']/img/@src"
@@ -80,7 +81,8 @@ class PhiladelphiaPersonScraper(Scraper):
             url = from_x(card.xpath(link_xpath))
             url = f"{self.COUNCIL_ROOT}{url}"
             district = from_x(card.xpath(district_xpath))
-            title = from_x(card.xpath(title_xpath))
+            whip_title = from_x(card.xpath(whip_title_xpath))
+            council_title = from_x(card.xpath(council_title_xpath))
             pic = from_x(card.xpath(pic_path))
 #       
 #        # the urls of the council people
@@ -139,13 +141,25 @@ class PhiladelphiaPersonScraper(Scraper):
                     district="Councilmember at Large",
                     end_date="2025-01-01")
     
-            if title in ["Council President", "Majority Whip"]:
+         
+
+            if (council_title.upper() in ["COUNCIL PRESIDENT"]):
                 person.add_term(
                         role="member",
                         org_classification="legislature",
-                        label=title,
-                        district=title,
+                        label=council_title.title(),
+                        district=council_title.title(),
                         end_date="2025-01-01")
+
+
+            if (whip_title.upper() in ["MAJORITY WHIP"]):
+                person.add_term(
+                        role="member",
+                        org_classification="legislature",
+                        label=whip_title.title(),
+                        district=whip_title.title(),
+                        end_date="2025-01-01")
+
 
             # TODO Phila site's contact info is a little tedious to parse
 
