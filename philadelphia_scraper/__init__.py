@@ -32,19 +32,19 @@ class Philadelphia(Jurisdiction):
         #and classification is described here:
         org = Organization(name="Philadelphia City Council", classification="legislature")
         org.add_source(self.url)
-        # OPTIONAL: add posts to your organizaion using this format,
-        # where label is a human-readable description of the post (eg "Ward 8 councilmember")
-        # and role is the position type (eg councilmember, alderman, mayor...)
-        # skip entirely if you're not writing a people scraper.
-        org.add_post(label="Council President", role="Council President")
+       
+        # See https://www.popoloproject.com/specs/post.html
+        org.add_post(label="Council President", role="member")
+        org.add_post(label="Majority Whip", role="member")
         for dist in range(1,11):
-            org.add_post(label=f"District {dist} Councilmember", role=f"District {dist} Councilmember")
-
+            org.add_post(label=f"District {dist} Councilmember", role=f"member")
+    
         # There are 6 at-larges - 
         org.add_post(
-                label=f"Councilmember at Large",
-                role="Councilmember at Large",
+                label="Councilmember at Large",
+                role="member",
                 maximum_memberships=6)
+
 
 
         #REQUIRED: yield the organization

@@ -62,7 +62,6 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                 #votes = (result, self.extractVotes(tally_url) if tally_url is not None else None)
                 votes = self.extractVotes(tally_url) if tally_url is not None else None
             
-            print("done looking at those actions")
             yield bill_action, votes
 
     def clean_action_classification(self, action: str | None) -> str:

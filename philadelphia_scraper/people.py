@@ -3,7 +3,21 @@ from pupa.scrape import Person
 from pupa.scrape import Organization
 import lxml
 import re
+import logging
+from datetime import date
+from typing import List
 
+logger = logging.getLogger(__name__)
+
+
+def from_x(els: List["lxml.etree._Element"]) -> str:
+    """
+    Given an element, check its a singleton, and return its text, or ""
+    """
+    if len(els) != 1:
+        return ""
+    if isinstance(els[0], str): return els[0]
+    return els[0].text
 
 def strip_name_end(full_name):
     """
@@ -38,11 +52,13 @@ class PhiladelphiaPersonScraper(Scraper):
         council.add_source(self.COUNCIL_ROOT)
         yield council
 
-        name_xpath = "//h4[@class='x-face-title']/strong"
-        title_xpath = "//p[@class='x-face-text']/big/strong" # the 'Whip' or 'Leader' title, if any. 
-        district_xpath = "//p[@class='x-face-text']/strong" # district, not the 'Whip' or 
-        link_xpath = "//a[@class='x-face-button']/@href"
-        pic_path = "//div[@class='x-face-graphic']/img/@src"
+        # nb. the . at the start of each path makes the search relative.
+        name_xpath = ".//h4[@class='x-face-title']/strong"
+        # where the data is written on front and back of the card, pick one.
+        title_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/big/strong" # the 'Whip' or 'Leader' title, if any. 
+        district_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/strong" # district, not the 'Whip' or 
+        link_xpath = ".//a[@class='x-face-button']/@href"
+        pic_path = ".//div[@class='x-face-graphic']/img/@src"
 
 
         response = self.request(url=self.COUNCIL_URL, method="GET")
@@ -50,19 +66,37 @@ class PhiladelphiaPersonScraper(Scraper):
         html = response.text
         doc = lxml.html.fromstring(html)
 
-        
-        # the urls of the council people
-        urls = [f"{self.COUNCIL_ROOT}{end_part}" for end_part in doc.xpath(link_xpath)]
-        names = [el.text for el in doc.xpath(name_xpath)]
-        districts = [el.text for el in doc.xpath(district_xpath)]
-        titles = [el.text for el in doc.xpath(title_xpath)]
-        pad_list(titles, names, "")
+ 
+        # philly's council site has members on 'cards'. We'll iterate over each card to make sure
+        # we catch those that are vacant and keep all the data points together.
+        cards_path = "//div[@class='x-card-inner']"
+        cards = doc.xpath(cards_path)
 
-        images = doc.xpath(pic_path)
+        for card in cards:
 
 
-        for url, name, district, title, pic in zip(urls, names, districts, titles, images):
-
+            
+            name = from_x(card.xpath(name_xpath))
+            url = from_x(card.xpath(link_xpath))
+            url = f"{self.COUNCIL_ROOT}{url}"
+            district = from_x(card.xpath(district_xpath))
+            title = from_x(card.xpath(title_xpath))
+            pic = from_x(card.xpath(pic_path))
+#       
+#        # the urls of the council people
+#        urls = [f"{self.COUNCIL_ROOT}{end_part}" for end_part in doc.xpath(link_xpath)]
+#        names = [el.text for el in doc.xpath(name_xpath)]
+#        districts = [el.text for el in doc.xpath(district_xpath)]
+#        titles = [el.text for el in doc.xpath(title_xpath)]
+#        pad_list(titles, names, "")
+#
+#        images = doc.xpath(pic_path)
+#
+            dist_pat = re.compile(r"^DISTRICT (?P<distnum>\d+)$")
+#
+#
+#        for url, name, district, title, pic in zip(urls, names, districts, titles, images, strict=True):
+#
             name_parts = strip_name_end(name).split(" ")
             last_name = name_parts[-1] 
 
@@ -72,9 +106,46 @@ class PhiladelphiaPersonScraper(Scraper):
             person.family_name = last_name
 
             # Add membership on council.
-            # TODO the role needs to be one of the Posts added in __init__.py
-            breakpoint()
-            person.add_membership(council, role="District 1 Councilmember")
+            person.add_membership(council)
+
+            # add terms of office. I think this is where the site picks up that Joe is the Dist
+            # 1 Council member. 
+
+    
+            match = dist_pat.match(district)
+            if match:
+                dist_num = match.group('distnum')
+
+
+            else:
+                logger.warn("unknown district pattern for %s: %s", name, district) 
+                dist_num = None
+    
+
+            if dist_num:
+                person.add_term(role="member", 
+                    org_classification="legislature",
+                    label=f"District {dist_num} Councilmember", 
+                    district=f"District {dist_num} Councilmember",
+                    # NB end_date is REQUIRED. The councilmember querset won't find any council members
+                    # if the end dates for their terms aren't set.
+                    end_date = "2025-01-01")
+
+            else:
+                # at large members w/out districts.
+                person.add_term(role="member",
+                    org_classification="legislature",
+                    label="Councilmember at Large",
+                    district="Councilmember at Large",
+                    end_date="2025-01-01")
+    
+            if title in ["Council President", "Majority Whip"]:
+                person.add_term(
+                        role="member",
+                        org_classification="legislature",
+                        label=title,
+                        district=title,
+                        end_date="2025-01-01")
 
             # TODO Phila site's contact info is a little tedious to parse
 
