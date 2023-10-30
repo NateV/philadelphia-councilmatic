@@ -73,6 +73,9 @@ class PhiladelphiaPersonScraper(Scraper):
         cards_path = "//div[@class='x-card-inner']"
         cards = doc.xpath(cards_path)
 
+        # Ughhhh.
+        at_large_counter = 1
+
         for card in cards:
 
 
@@ -137,12 +140,13 @@ class PhiladelphiaPersonScraper(Scraper):
                 # at large members w/out districts.
                 person.add_term(role="member",
                     org_classification="legislature",
-                    label="Councilmember at Large",
-                    district="Councilmember at Large",
+                    label=f"Councilmember at Large ({at_large_counter})",
+                    district=f"Councilmember at Large ({at_large_counter})",
                     end_date="2025-01-01")
-    
-         
+                at_large_counter += 1
 
+         
+            # TODO sould leadership titles be 'roles', not Posts?
             if (council_title.upper() in ["COUNCIL PRESIDENT"]):
                 person.add_term(
                         role="member",

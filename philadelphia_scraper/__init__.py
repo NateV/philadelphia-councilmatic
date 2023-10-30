@@ -40,11 +40,12 @@ class Philadelphia(Jurisdiction):
             org.add_post(label=f"District {dist} Councilmember", role=f"member")
     
         # There are 6 at-larges - 
-        org.add_post(
-                label="Councilmember at Large",
-                role="member",
-                maximum_memberships=6)
-
+        # TODO what is the proper way to handle multi-seat 'Posts'?
+        for at_large in range(1,7):
+           org.add_post(
+                   label=f"Councilmember at Large ({at_large})",
+                   role="member")
+   
 
 
         #REQUIRED: yield the organization
