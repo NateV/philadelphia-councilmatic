@@ -4,7 +4,9 @@ services:
     image: elasticsearch:7.17.10
     environment:
       - node.name=topboss
-      - cluster.initial_master_nodes=topboss
+        # single-node avoids the vm memory limit
+        #- cluster.initial_master_nodes=topboss
+      - discovery.type=single-node
     ports:
       - 127.0.0.1:9200:9200
     volumes:
