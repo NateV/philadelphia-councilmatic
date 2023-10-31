@@ -3,6 +3,7 @@ from pupa.scrape import Scraper
 import json
 from pupa.scrape import Bill, VoteEvent
 from pupa.scrape.bill import Action
+#from councilmatic_core.models import Bill
 from legistar.bills import LegistarBillScraper
 from datetime import date
 import datetime
@@ -163,6 +164,8 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
 
         I need to then create Bill objects from each bill.
 
+
+        This method goes over the summary list of legislation at https://phila.legistar.com/legislation.aspx
         """
         for bill in self.legislation(created_after=created_after, created_before=created_before, search_text=search_text):
         
@@ -193,6 +196,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
     
                 if bill.get('url') is not None:
                     bill_.add_source(bill['url'],note="web")
+                    bill_ = self.add_content(bill_, bill['url'])
                     for action, vote in self.actions(bill.get('url') or ""):
 
                         # Classification of an action describes the type of the action, like 'filing' or 'executive-signature'
@@ -217,6 +221,20 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                 
                 yield bill_
 
+    def add_content(self, bill: Bill, url: str) -> Bill:
+        """
+        Add textual details related to a bill.
+
+        """
+        bill.add_subject(bill.title)
+        page = self.lxmlize(url)
+
+        sponsors_span = page.xpath("//span[@id='ctl00_ContentPlaceHolder1_lblSponsors2']")
+
+        #bill.friendly_name = bill.title
+        bill.add_subject(bill.title)
+
+        return bill
     def get_vote_event(self, bill: Bill, act: Action, votes: List[Tuple[str, str]], result: str) -> VoteEvent:
         '''Make VoteEvent object from given Bill, action, votes and result.'''
         organization = json.loads(act['organization_id'].lstrip('~'))
