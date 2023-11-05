@@ -167,6 +167,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
 
         This method goes over the summary list of legislation at https://phila.legistar.com/legislation.aspx
         """
+        bill: Dict
         for bill in self.legislation(created_after=created_after, created_before=created_before, search_text=search_text):
         
 
