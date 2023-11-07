@@ -1,3 +1,5 @@
+import os
+
 # Leave these blank
 OCD_CITY_COUNCIL_NAME = ''
 CITY_COUNCIL_NAME = ''
@@ -12,5 +14,4 @@ INSTALLED_APPS = (
     'councilmatic_core'
 )
 
-# Change this if you called your database something different
-DATABASE_URL = 'postgres://dev:dev@localhost/philacouncil'
+DATABASE_URL = os.environ['DBURL']

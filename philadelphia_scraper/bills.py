@@ -7,6 +7,7 @@ from pupa.scrape.bill import Action
 from legistar.bills import LegistarBillScraper
 from datetime import date
 import datetime
+from lxml import etree
 import re
 
 import logging
@@ -157,7 +158,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
         return possible_classification
 
 
-    def scrape(self, search_text: str='qualified electors', created_after: date | None = date(2023,1,1), created_before: date | None = date(2023,1,28) ) -> Generator[Bill | VoteEvent, None, None]:
+    def scrape(self, search_text: str='qualified electors', created_after: date | None = date(2023,1,1), created_before: date | None = date(2023,2,28) ) -> Generator[Bill | VoteEvent, None, None]:
         """
         
         LegistarBillsScraper.legislation() is going to yield bills as dicts.
@@ -187,13 +188,14 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
                 
                 legislative_session =str(datetime.datetime.strptime(bill.get("File\xa0Created") or "","%m/%d/%Y").year )
                  
-                assert identifier is not None
+                assert identifier is not None and (identifier != "")
 
                 bill_ = Bill(identifier=identifier,
                         title=title,
                         classification=classification,
                         legislative_session=legislative_session,
                         from_organization={"name": "Philadelphia City Council"})
+
     
                 if bill.get('url') is not None:
                     bill_.add_source(bill['url'],note="web")
@@ -232,10 +234,22 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
 
         sponsors_span = page.xpath("//span[@id='ctl00_ContentPlaceHolder1_lblSponsors2']")
 
-        #bill.friendly_name = bill.title
         bill.add_subject(bill.title)
 
+        # get the bill's pdf url
+        doc_links = page.xpath("//span[@id='ctl00_ContentPlaceHolder1_lblAttachments2']//a/@href")
+        for idx, dl in enumerate(doc_links):
+            bill.add_document_link(url=dl, note=f"Legislation Attachment PDF {idx}", media_type="pdf")
+
+        # bill's text as html
+        bill_texts = page.xpath("//div[@id='ctl00_ContentPlaceHolder1_divText']")
+        for idx, bill_text in enumerate(bill_texts):
+            bill.extras["html_text"] = str(etree.tostring(bill_text))
+            bill.extras["plain_text"] = bill_text.text_content()
+            bill.add_document_link(url=url, note=f"Text, {idx}", text=bill_text.text_content(), media_type="plain_text")  
+
         return bill
+
     def get_vote_event(self, bill: Bill, act: Action, votes: List[Tuple[str, str]], result: str) -> VoteEvent:
         '''Make VoteEvent object from given Bill, action, votes and result.'''
         organization = json.loads(act['organization_id'].lstrip('~'))

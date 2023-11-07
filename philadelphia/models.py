@@ -6,7 +6,7 @@ import pytz
 
 app_timezone = pytz.timezone(settings.TIME_ZONE)
 
-class CityBill(Bill):
+class PhilaBill(Bill):
     """
     Subclass of Pupa's Bill that overrides certain methods to make nicer Philadelphia-centric bills.
 
@@ -17,6 +17,8 @@ class CityBill(Bill):
     class Meta:
         proxy = True
     def __init__(self,*args, **kwargs):
+        # Huh - so CityBill gets instantiated in the search page, 
+        # but not in the bill detail page??
         super().__init__(*args, **kwargs)
 
     @property
@@ -29,5 +31,14 @@ class CityBill(Bill):
             words = " ".join(words[0:5]) + "..."
 
         return f"{self.identifier} - {words}"
+
+    @property
+    def full_text_doc_url(self):
+        """
+        overriding default so we can embed pdfs of bill text.
+        """
+        breakpoint()
+        return self.documents[0].document_link
+        
 
 

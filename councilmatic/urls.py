@@ -33,5 +33,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     url(r'^search/', CouncilmaticFacetedSearchView(searchqueryset=sqs,
                                                    form_class=CouncilmaticSearchForm)),
+    url(r'', include('philadelphia.urls')),
     url(r'', include('councilmatic_core.urls')),
 ]
