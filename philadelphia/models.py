@@ -37,8 +37,14 @@ class PhilaBill(Bill):
         """
         overriding default so we can embed pdfs of bill text.
         """
-        breakpoint()
-        return self.documents[0].document_link
+        
+
+        # self.documents is a RelatedManager for BillDocument objs. from
+        # here: https://github.com/opencivicdata/python-opencivicdata/blob/master/opencivicdata/legislative/models/bill.py
+        # then the BilDocument has links,
+        # and links get urls from a LinkMixin.
+        # https://github.com/opencivicdata/python-opencivicdata/blob/1c352a8d246846d1bce976a8c3686ee4f35d0e69/opencivicdata/core/models/base.py#L91
+        return self.documents.all()[0].links.all()[0].url
         
 
 

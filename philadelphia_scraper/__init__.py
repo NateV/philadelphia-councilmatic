@@ -4,9 +4,11 @@ from .events import PhiladelphiaEventScraper
 from .people import PhiladelphiaPersonScraper
 from .bills import PhiladelphiaBillScraper
 
+DIVISION_ID = "ocd-division/country:us/state:pa/place:philadelphia"
+
 
 class Philadelphia(Jurisdiction):
-    division_id = "ocd-division/country:us/state:pa/place:philadelphia"
+    division_id = DIVISION_ID
     classification = "legislature"
     name = "City of Philadelphia"
     url = "https://phlcouncil.com/"

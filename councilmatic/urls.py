@@ -18,21 +18,9 @@ from django.conf.urls import include, url
 from django.urls import path
 from django.contrib import admin
 from django.views.generic.base import RedirectView
-from haystack.query import SearchQuerySet
-from councilmatic_core.views import CouncilmaticSearchForm, CouncilmaticFacetedSearchView
-
-sqs = (SearchQuerySet().facet('bill_type')
-                      .facet('sponsorships') #, sort='index')
-                      .facet('controlling_body')
-                      .facet('inferred_status')
-                      .facet('topics')
-                      .facet('legislative_session')
-                      .highlight())
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    url(r'^search/', CouncilmaticFacetedSearchView(searchqueryset=sqs,
-                                                   form_class=CouncilmaticSearchForm)),
     url(r'', include('philadelphia.urls')),
     url(r'', include('councilmatic_core.urls')),
 ]
