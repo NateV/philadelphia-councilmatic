@@ -85,6 +85,7 @@ CITY_COUNCIL_MEETING_NAME = 'City Council'
 # as stored in legistar
 # if this is set, committees will display chairs
 COMMITTEE_CHAIR_TITLE = 'Chair'
+COMMITTEE_VICE_CHAIR_TITLE = 'Vice Chair'
 
 # this is the anme of the role of committee members,
 # as stored in legistar
@@ -112,14 +113,15 @@ LEGISLATION_TYPE_DESCRIPTIONS = [
 
 # these keys should match committee slugs
 COMMITTEE_DESCRIPTIONS = {
+        "environment-96143a18b20b":"Environmental stuff"
     # e.g. "committee-on-aviation" : "The Committee on Aviation has jurisdiction over matters relating to aviation and airports.",
 }
 
 # these blurbs populate the wells on the committees, events, & council members pages
 ABOUT_BLURBS = {
-    "COMMITTEES" :      "",
+    "COMMITTEES" :      "The committees have lots of meetings.",
     "EVENTS":           "",
-    "COUNCIL_MEMBERS":  "",
+    "COUNCIL_MEMBERS":  "These people are here.",
 }
 
 # these override the headshots that are automatically populated

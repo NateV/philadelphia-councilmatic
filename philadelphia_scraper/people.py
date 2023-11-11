@@ -6,6 +6,7 @@ import re
 import logging
 from datetime import date
 from typing import List
+from philadelphia_scraper.utils import name_adjuster
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +20,15 @@ def from_x(els: List["lxml.etree._Element"]) -> str:
     if isinstance(els[0], str): return els[0]
     return els[0].text
 
+def get_last_name(full_name: str) -> str:
+    name_parts = strip_name_end(full_name)
+    return name_parts[-1]
+
 def strip_name_end(full_name):
     """
     Remove Jr, III, etc. from names, if present.
     """
-    return re.sub(r"(, jr\.)|( i+ )", "", full_name, flags=re.I)
+    return re.sub(r"(,? jr\.)|( i+ )", "", full_name, flags=re.I)
 
 def pad_list(short, long, pad_with):
     """
@@ -76,11 +81,15 @@ class PhiladelphiaPersonScraper(Scraper):
         # Ughhhh.
         at_large_counter = 1
 
+
         for card in cards:
 
 
             
+            
             name = from_x(card.xpath(name_xpath))
+            if re.search("vacant",name, flags=re.I): 
+                continue
             url = from_x(card.xpath(link_xpath))
             url = f"{self.COUNCIL_ROOT}{url}"
             district = from_x(card.xpath(district_xpath))
@@ -102,12 +111,12 @@ class PhiladelphiaPersonScraper(Scraper):
 #
 #        for url, name, district, title, pic in zip(urls, names, districts, titles, images, strict=True):
 #
-            name_parts = strip_name_end(name).split(" ")
-            last_name = name_parts[-1] 
+            last_name = get_last_name(name)
 
             # Create legislator.
-            person = Person(name, image=pic, district=district)
+            person = Person(name_adjuster(name), image=pic, district=district)
             # I don't know what to do for names that have family name as not last.
+            # We need the family name because legislation is linked to people in legistar only by 'CouncilMember [last name]'.
             person.family_name = last_name
 
             # Add membership on council.
@@ -177,3 +186,4 @@ class PhiladelphiaPersonScraper(Scraper):
             person.add_source(url)
 
             yield person
+

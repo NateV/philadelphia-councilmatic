@@ -24,5 +24,10 @@ urlpatterns = [
         name='bill_detail',),
     url(r'^search/', CouncilmaticFacetedSearchView(searchqueryset=sqs,
                                                    form_class=CouncilmaticSearchForm)),
+    url(
+        r"^committee/(?P<slug>[^/]+)/$",
+        views.CommitteeDetailView.as_view(),
+        name="committee_detail",
+    ),
 
         ]

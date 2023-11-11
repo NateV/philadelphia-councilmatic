@@ -41,4 +41,51 @@ class PhilaBillDetailView(BillDetailView):
 
 
 
+class CommitteeDetailView(DetailView):
+    model = Organization
+    template_name = "philadelphia/committee.html"
+    context_object_name = "committee"
+
+    def get_context_data(self, **kwargs):
+        context = super(CommitteeDetailView, self).get_context_data(**kwargs)
+
+        committee = context["committee"]
+        context["memberships"] = committee.memberships.all()
+        description = None
+
+        if getattr(settings, "COMMITTEE_DESCRIPTIONS", None):
+            description = settings.COMMITTEE_DESCRIPTIONS.get(committee.slug)
+            context["committee_description"] = description
+
+        seo = {}
+        seo.update(settings.SITE_META)
+
+        if description:
+            seo["site_desc"] = description
+        else:
+            seo["site_desc"] = "See what %s's %s has been up to!" % (
+                settings.CITY_COUNCIL_NAME,
+                committee.name,
+            )
+
+        seo["title"] = "%s - %s" % (committee.name, settings.SITE_META["site_name"])
+        context["seo"] = seo
+
+        context["user_subscribed_actions"] = False
+        context["user_subscribed_events"] = False
+        if self.request.user.is_authenticated:
+            user = self.request.user
+            context["user"] = user
+            # check if person of interest is subscribed to by user
+
+            if settings.USING_NOTIFICATIONS:
+                for cas in user.committeeactionsubscriptions.all():
+                    if committee == cas.committee:
+                        context["user_subscribed_actions"] = True
+                for ces in user.committeeeventsubscriptions.all():
+                    if committee == ces.committee:
+                        context["user_subscribed_events"] = True
+        return context
+
+
 

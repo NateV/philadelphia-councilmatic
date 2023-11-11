@@ -3,6 +3,7 @@ from pupa.scrape import Jurisdiction, Organization
 from .events import PhiladelphiaEventScraper
 from .people import PhiladelphiaPersonScraper
 from .bills import PhiladelphiaBillScraper
+from .committees import PhiladelphiaCommitteeScraper
 
 DIVISION_ID = "ocd-division/country:us/state:pa/place:philadelphia"
 
@@ -15,7 +16,8 @@ class Philadelphia(Jurisdiction):
     scrapers = {
         #"events": PhiladelphiaEventScraper,
         "people": PhiladelphiaPersonScraper,
-        "bills": PhiladelphiaBillScraper,
+        #"bills": PhiladelphiaBillScraper,
+        "committees": PhiladelphiaCommitteeScraper,
     }
 
     legislative_sessions = [
