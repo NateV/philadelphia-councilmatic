@@ -69,7 +69,7 @@ class PhiladelphiaCommitteeScraper(Scraper):
             try:
                 vice_chair = el.xpath(vice_chair_path)[0].text
                 post = o.add_post(label="Vice Chair", role="Vice Chair")
-                o.add_member(vice_chair, "Vice Chair", post_id=post._id, end_date=term_end_date, label="Chair")
+                o.add_member(vice_chair, "Vice Chair", post_id=post._id, end_date=term_end_date, label="Vice Chair")
             except:
                 logger.warn("Could not find vice chair for %s" % committee_name)
 
@@ -79,7 +79,7 @@ class PhiladelphiaCommitteeScraper(Scraper):
                     [m.strip() for m in el.xpath(members_path)[0].text.split(",")]
                     ) 
                 for m in members:
-                    o.add_member(m, end_date=term_end_date, role="Member", label="Chair")
+                    o.add_member(m, end_date=term_end_date, role="Member", label="Member")
             except:
                 logger.warn("Could not find members for %s" % committee_name)
 

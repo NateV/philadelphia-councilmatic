@@ -21,7 +21,8 @@ def from_x(els: List["lxml.etree._Element"]) -> str:
     return els[0].text
 
 def get_last_name(full_name: str) -> str:
-    name_parts = strip_name_end(full_name)
+    name_parts = strip_name_end(full_name).split(" ")
+    last_name = name_parts[-1]
     return name_parts[-1]
 
 def strip_name_end(full_name):
