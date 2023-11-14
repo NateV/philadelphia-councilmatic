@@ -16,7 +16,7 @@ class Philadelphia(Jurisdiction):
     scrapers = {
         #"events": PhiladelphiaEventScraper,
         "people": PhiladelphiaPersonScraper,
-        #"bills": PhiladelphiaBillScraper,
+        "bills": PhiladelphiaBillScraper,
         "committees": PhiladelphiaCommitteeScraper,
     }
 
@@ -38,17 +38,17 @@ class Philadelphia(Jurisdiction):
         org.add_source(self.url)
        
         # See https://www.popoloproject.com/specs/post.html
-        org.add_post(label="Council President", role="member")
-        org.add_post(label="Majority Whip", role="member")
+        org.add_post(label="Council President", role="Member")
+        org.add_post(label="Majority Whip", role="Member")
         for dist in range(1,11):
-            org.add_post(label=f"District {dist} Councilmember", role=f"member")
+            org.add_post(label=f"District {dist} Councilmember", role=f"Member")
     
         # There are 6 at-larges - 
         # TODO what is the proper way to handle multi-seat 'Posts'?
         for at_large in range(1,7):
            org.add_post(
                    label=f"Councilmember at Large ({at_large})",
-                   role="member")
+                   role="Member")
    
 
 

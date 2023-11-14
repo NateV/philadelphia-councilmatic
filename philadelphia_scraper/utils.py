@@ -1,4 +1,6 @@
-
+import re
+from typing import List
+import lxml
 
 
 class PassthroughDict:
@@ -18,6 +20,38 @@ class PassthroughDict:
 
 name_adjuster = PassthroughDict({
         "Quetcy Lozada": "Quetcy M. Lozada",
-        "Kathrine Gilmore Richardson": "Katherine Gilmore Richardson"
+        "Kathrine Gilmore Richardson": "Katherine Gilmore Richardson",
+        # Map Richardson to her whole last name, Gilmore Richardson.
+        "Richardson": "Gilmore Richardson",
+        # Legistar reports this last name with a ', but the city's site uses
+        "O'Neill":"O’Neill",
     })
+
+def from_x(els: List["lxml.etree._Element"]) -> str:
+    """
+    Given an element, check its a singleton, and return its text, or ""
+    """
+    if len(els) != 1:
+        return ""
+    if isinstance(els[0], str): return els[0]
+    return els[0].text
+
+def get_last_name(full_name: str) -> str:
+    name_parts = strip_name_end(full_name).split(" ")
+    last_name = name_parts[-1]
+    return name_adjuster(name_parts[-1])
+
+def strip_name_end(full_name):
+    """
+    Remove Jr, III, etc. from names, if present.
+    """
+    return re.sub(r"(,? jr\.)|( i+ )", "", full_name, flags=re.I)
+
+def pad_list(short, long, pad_with):
+    """
+    pad the short list with the pad_with until its as long as the long list
+    """
+    pad = [pad_with for _ in range(0, len(long)-len(short))]
+    return short.extend(pad)
+
 

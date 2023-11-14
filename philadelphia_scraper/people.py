@@ -6,37 +6,14 @@ import re
 import logging
 from datetime import date
 from typing import List
-from philadelphia_scraper.utils import name_adjuster
+from philadelphia_scraper.utils import (
+        name_adjuster,
+        from_x,
+        get_last_name,
+        pad_list
+        )
 
 logger = logging.getLogger(__name__)
-
-
-def from_x(els: List["lxml.etree._Element"]) -> str:
-    """
-    Given an element, check its a singleton, and return its text, or ""
-    """
-    if len(els) != 1:
-        return ""
-    if isinstance(els[0], str): return els[0]
-    return els[0].text
-
-def get_last_name(full_name: str) -> str:
-    name_parts = strip_name_end(full_name).split(" ")
-    last_name = name_parts[-1]
-    return name_parts[-1]
-
-def strip_name_end(full_name):
-    """
-    Remove Jr, III, etc. from names, if present.
-    """
-    return re.sub(r"(,? jr\.)|( i+ )", "", full_name, flags=re.I)
-
-def pad_list(short, long, pad_with):
-    """
-    pad the short list with the pad_with until its as long as the long list
-    """
-    pad = [pad_with for _ in range(0, len(long)-len(short))]
-    return short.extend(pad)
 
 class PhiladelphiaPersonScraper(Scraper):
 
@@ -48,7 +25,7 @@ class PhiladelphiaPersonScraper(Scraper):
     """
 
     COUNCIL_ROOT = "https://phlcouncil.com/"
-    COUNCIL_URL = "https://phlcouncil.com/council-members/"
+    COUNCIL_URL = "https://phlcouncil.com/council-members"
 
 
     def scrape(self):
@@ -87,8 +64,7 @@ class PhiladelphiaPersonScraper(Scraper):
 
 
             
-            
-            name = from_x(card.xpath(name_xpath))
+            name = from_x(card.xpath(name_xpath)).title()
             if re.search("vacant",name, flags=re.I): 
                 continue
             url = from_x(card.xpath(link_xpath))
@@ -112,6 +88,7 @@ class PhiladelphiaPersonScraper(Scraper):
 #
 #        for url, name, district, title, pic in zip(urls, names, districts, titles, images, strict=True):
 #
+            #if re.search(r"Harrity", name,flags=re.I): breakpoint()
             last_name = get_last_name(name)
 
             # Create legislator.
@@ -121,7 +98,8 @@ class PhiladelphiaPersonScraper(Scraper):
             person.family_name = last_name
 
             # Add membership on council.
-            person.add_membership(council)
+            # is this a mistake, since we're also adding roles?
+            #person.add_membership(council)
 
             # add terms of office. I think this is where the site picks up that Joe is the Dist
             # 1 Council member. 
@@ -138,7 +116,7 @@ class PhiladelphiaPersonScraper(Scraper):
     
 
             if dist_num:
-                person.add_term(role="member", 
+                person.add_term(role="Member", 
                     org_classification="legislature",
                     label=f"District {dist_num} Councilmember", 
                     district=f"District {dist_num} Councilmember",
@@ -148,7 +126,7 @@ class PhiladelphiaPersonScraper(Scraper):
 
             else:
                 # at large members w/out districts.
-                person.add_term(role="member",
+                person.add_term(role="Member",
                     org_classification="legislature",
                     label=f"Councilmember at Large ({at_large_counter})",
                     district=f"Councilmember at Large ({at_large_counter})",
@@ -159,16 +137,17 @@ class PhiladelphiaPersonScraper(Scraper):
             # TODO sould leadership titles be 'roles', not Posts?
             if (council_title.upper() in ["COUNCIL PRESIDENT"]):
                 person.add_term(
-                        role="member",
+                        role="Member",
                         org_classification="legislature",
                         label=council_title.title(),
                         district=council_title.title(),
                         end_date="2025-01-01")
+                person.add_name(f"Council President {last_name}")
 
 
             if (whip_title.upper() in ["MAJORITY WHIP"]):
                 person.add_term(
-                        role="member",
+                        role="Member",
                         org_classification="legislature",
                         label=whip_title.title(),
                         district=whip_title.title(),
@@ -185,6 +164,5 @@ class PhiladelphiaPersonScraper(Scraper):
 
             # Add sources.
             person.add_source(url)
-
             yield person
 

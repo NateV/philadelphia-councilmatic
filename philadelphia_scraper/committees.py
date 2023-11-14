@@ -4,7 +4,12 @@ import logging
 from datetime import date
 from typing import List
 import re
-from philadelphia_scraper.utils import name_adjuster
+from philadelphia_scraper.utils import (
+        name_adjuster,
+        from_x,
+        get_last_name,
+        pad_list
+        )
 
 logger = logging.getLogger(__name__)
 
@@ -60,15 +65,30 @@ class PhiladelphiaCommitteeScraper(Scraper):
             chair_path = ".//h6[text()='Chair']/following-sibling::p[1]"
             try:
                 chair = el.xpath(chair_path)[0].text
-                post = o.add_post(label=f"Chair", role="Chair")
-                o.add_member(chair, "Chair", post_id=post._id, end_date=term_end_date, label="Chair")
+                post = o.add_post(label=f"Chair of {committee_name}", role="Chair")
+                # family names are needed here, because we use them in the 
+                # PeopleScraper. If they're not included, these Person objects
+                # don't match the Person objects already in the db, so pupa
+                # won't know they are the same people.
+                #last_name = get_last_name(chair)
+                #chair = Person(chair)
+                #chair.family_name = last_name
+                #chair.add_source(self.COMMITTEES_LIST)
+                #yield chair
+                o.add_member(chair, "Chair", 
+                        post_id=post._id, end_date=term_end_date, label="Chair")
             except:
                 logger.warn("Could not find chair for %s" % committee_name)
 
             vice_chair_path = ".//h6[text()='Vice Chair']/following-sibling::p[1]"
             try:
                 vice_chair = el.xpath(vice_chair_path)[0].text
-                post = o.add_post(label="Vice Chair", role="Vice Chair")
+                #last_name = get_last_name(vice_chair)
+                #vice_chair = Person(vice_chair)
+                #vice_chair.family_name = last_name
+                #vice_chair.add_source(self.COMMITTEES_LIST)
+                #yield vice_chair
+                post = o.add_post(label=f"Vice Chair of {committee_name}", role="Vice Chair")
                 o.add_member(vice_chair, "Vice Chair", post_id=post._id, end_date=term_end_date, label="Vice Chair")
             except:
                 logger.warn("Could not find vice chair for %s" % committee_name)
@@ -78,7 +98,13 @@ class PhiladelphiaCommitteeScraper(Scraper):
                 members = repair_names(
                     [m.strip() for m in el.xpath(members_path)[0].text.split(",")]
                     ) 
+
                 for m in members:
+                    #m_ = Person(m)
+                    #m_.family_name = get_last_name(m)
+
+                    #m_.add_source(self.COMMITTEES_LIST)
+                    #yield m_
                     o.add_member(m, end_date=term_end_date, role="Member", label="Member")
             except:
                 logger.warn("Could not find members for %s" % committee_name)
