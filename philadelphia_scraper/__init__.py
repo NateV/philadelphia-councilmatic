@@ -14,7 +14,7 @@ class Philadelphia(Jurisdiction):
     name = "City of Philadelphia"
     url = "https://phlcouncil.com/"
     scrapers = {
-        #"events": PhiladelphiaEventScraper,
+        "events": PhiladelphiaEventScraper,
         "people": PhiladelphiaPersonScraper,
         "bills": PhiladelphiaBillScraper,
         "committees": PhiladelphiaCommitteeScraper,

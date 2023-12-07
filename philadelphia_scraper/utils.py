@@ -29,12 +29,19 @@ name_adjuster = PassthroughDict({
 
 def from_x(els: List["lxml.etree._Element"]) -> str:
     """
-    Given an element, check its a singleton, and return its text, or ""
+    Given a list of xml elements, like from an xpath query, check its a singleton, and return its text, or ""
     """
     if len(els) != 1:
         return ""
     if isinstance(els[0], str): return els[0]
     return els[0].text
+
+def content_from_x(els: List["lxml.etree.Element"]) -> str:
+    if len(els) != 1:
+        return ""
+    if isinstance(els[0], str): 
+        return els[0]
+    return els[0].text_content().strip()
 
 def get_last_name(full_name: str) -> str:
     name_parts = strip_name_end(full_name).split(" ")

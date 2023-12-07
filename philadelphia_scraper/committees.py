@@ -49,12 +49,17 @@ class PhiladelphiaCommitteeScraper(Scraper):
 
         for el in committees:
             try:
-                committee_name = el.xpath("./div/a")[0].text
+                committee_name = el.xpath("./div/a/span")[0].text
+                if committee_name is None:
+                    committee_name = el.xpath("./div/a/span")[0].text_content().strip()
+                if committee_name is None:
+                    logger.warn("Could not figure out committee name: ", el.text_content())
+                    continue
             except: 
+                logger.warn("Could not figure out committee name: ", el.text_content())
                 continue
             
-            if committee_name == "Whole Council": continue
-
+            if "Whole Council" in committee_name: continue
     
             o = Organization(committee_name, classification="committee")
             o.add_source(self.COMMITTEES_LIST)
