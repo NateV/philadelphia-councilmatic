@@ -1,0 +1,18 @@
+{
+    "people": [
+        {
+            "name":"David Oh",
+            "image":"https://en.wikipedia.org/wiki/File:David_Oh_(22029567536)_(1).jpg",
+            "family_name":"Oh",
+            "terms":[
+                {
+                    "role": "Member",
+                    "label":"Councilmember at Large (6)",
+                    "org_classification":"legislature",
+                    "district":"Councilmember at Large (6)",
+                    "end_date":"2023-02-13"
+                }
+            ]
+        } 
+    ]
+}

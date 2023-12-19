@@ -25,7 +25,7 @@ class Philadelphia(Jurisdiction):
             "identifier": "2023",
             "name": "2023 Regular Session",
             "start_date": "2023-05-20",
-            "end_date": "2023-12-19",
+            "end_date": "2023-12-30",
         },
     ]
 

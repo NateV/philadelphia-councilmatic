@@ -4,6 +4,7 @@ from pupa.scrape import Organization
 import lxml
 import re
 import logging
+import json 
 from datetime import date
 from typing import List
 from philadelphia_scraper.utils import (
@@ -92,7 +93,13 @@ class PhiladelphiaPersonScraper(Scraper):
             last_name = get_last_name(name)
 
             # Create legislator.
-            person = Person(name_adjuster(name), image=pic, district=district)
+            
+            # BUG seems like I should't put the district here, because I add a 
+            # term later...
+            #person = Person(name_adjuster(name), image=pic, district=district)
+            
+            person = Person(name_adjuster(name), image=pic)
+
             # I don't know what to do for names that have family name as not last.
             # We need the family name because legislation is linked to people in legistar only by 'CouncilMember [last name]'.
             person.family_name = last_name
@@ -165,4 +172,32 @@ class PhiladelphiaPersonScraper(Scraper):
             # Add sources.
             person.add_source(url)
             yield person
+
+        # If there's a former member who is still listed in committees and hearings,
+        # then we still need to add that person to the database, even if they're 
+        # no longer listed as a council member. 
+        # This extra_people.json file gives us a mechanism for just adding former 
+        # members by hand.
+        with open("philadelphia_scraper/extra_people.json","r") as extra_people_file:
+            extra_people = json.load(extra_people_file)
+            for extra_person_record in extra_people["people"]:
+                extra_p = Person(
+                        extra_person_record['name'],
+                        image=extra_person_record['image'])
+                extra_p.family_name = extra_person_record['family_name']
+
+                extra_p.add_source(self.COUNCIL_URL)
+
+                for term_record in extra_person_record["terms"]:
+                    extra_p.add_term(
+                        role=term_record["role"],
+                        org_classification=term_record["org_classification"],
+                        label=term_record["label"],
+                        district=term_record["district"],
+                        end_date=term_record["end_date"]
+                        )
+                yield extra_p
+
+
+
 
