@@ -15,3 +15,6 @@ class PhilaBillIndex(BillIndex, indexes.Indexable):
     def index_queryset(self, using=None):
         """Used when the entire index for model is updated."""
         return self.get_model().objects.all()
+
+    def prepare_actions(self, obj):
+        return [str(action) for action in obj.actions.all()]
