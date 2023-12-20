@@ -11,6 +11,7 @@ solr
 # Collected Static Files
 static/**
 **/static/images/ocd-person/*.jpg
+collected_static
 
 __pycache__
 downloads

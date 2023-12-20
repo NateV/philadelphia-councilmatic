@@ -6,10 +6,9 @@ from django.shortcuts import render
 
 
 
-
 class PhilaBillDetailView(BillDetailView):
     model = PhilaBill
-    template_name = "councilmatic_core/legislation.html"
+    template_name = "philadelphia/legislation.html"
     context_object_name = "legislation"
 
     def get_context_data(self, **kwargs):
