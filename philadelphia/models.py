@@ -3,6 +3,8 @@ from django.db import models
 from councilmatic_core.models import Bill, Event
 from datetime import datetime
 import pytz
+import re
+from urllib import parse
 
 app_timezone = pytz.timezone(settings.TIME_ZONE)
 
@@ -44,7 +46,16 @@ class PhilaBill(Bill):
         # then the BilDocument has links,
         # and links get urls from a LinkMixin.
         # https://github.com/opencivicdata/python-opencivicdata/blob/1c352a8d246846d1bce976a8c3686ee4f35d0e69/opencivicdata/core/models/base.py#L91
-        return self.documents.all()[0].links.all()[0].url
+         
         
-
+        # Instead of returning the regular url, the url should be to a cors proxy.
+        if len(docs := self.documents.all()) > 0:
+            if len(links := docs[0].links.all()) > 0:  
+                bill_url = links[0].url
+                url_patt = re.compile(r'https://phila.legistar.com/View\.ashx\?(?P<bill_url_id>.*)')
+                match = url_patt.match(bill_url)
+                if match:
+                    bill_url_id = parse.quote(match.group('bill_url_id'))
+                    return f"/pdfs/?url={bill_url_id}"
+                    #return bill_url_id
 

@@ -29,5 +29,5 @@ urlpatterns = [
         views.CommitteeDetailView.as_view(),
         name="committee_detail",
     ),
-
+    url(r"^pdfs/$", views.CORSProxyView.as_view(), name="cors_proxy"),
         ]

@@ -3,8 +3,8 @@ from philadelphia.models import *
 from councilmatic_core.views import *
 from django.conf import settings
 from django.shortcuts import render
-
-
+from django.views import View
+from django.http import HttpResponse
 
 class PhilaBillDetailView(BillDetailView):
     model = PhilaBill
@@ -38,6 +38,21 @@ class PhilaBillDetailView(BillDetailView):
         return context
 
 
+class CORSProxyView(View):
+    """
+    CORS Proxy so we can display pdfs of bills.
+    """
+    def get(self, request, *args, **kwargs):
+        url = request.GET.get('url')
+        if url:
+            # add the legistar url here.
+            full_url = "https://phila.legistar.com/View.ashx?" + url
+
+            remote_pdf = requests.get(full_url)
+            response = HttpResponse(remote_pdf.content)
+            if request.GET.get('download') == 'true':
+                response['Content-Disposition'] = 'attachment; filename=bill.pdf'
+            return response
 
 
 class CommitteeDetailView(DetailView):
