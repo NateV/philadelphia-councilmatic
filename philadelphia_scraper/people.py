@@ -25,6 +25,7 @@ class PhiladelphiaPersonScraper(Scraper):
     legislators from other sites.
     """
 
+    # TODO this should not have a trailing /
     COUNCIL_ROOT = "https://phlcouncil.com/"
     COUNCIL_URL = "https://phlcouncil.com/council-members"
 
@@ -61,7 +62,7 @@ class PhiladelphiaPersonScraper(Scraper):
         at_large_counter = 1
 
 
-        for card in cards:
+        for card_num, card in enumerate(cards):
 
 
             
@@ -111,8 +112,10 @@ class PhiladelphiaPersonScraper(Scraper):
             # add terms of office. I think this is where the site picks up that Joe is the Dist
             # 1 Council member. 
 
-    
-            match = dist_pat.match(district)
+
+
+            match = dist_pat.match(district or "")
+
             if match:
                 dist_num = match.group('distnum')
 

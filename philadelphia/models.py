@@ -59,3 +59,16 @@ class PhilaBill(Bill):
                     return f"/pdfs/?url={bill_url_id}"
                     #return bill_url_id
 
+
+    @property
+    def inferred_status(self):
+        actions = self.actions.all().order_by("-order")
+        classification_hist = [a.classification for a in actions]
+        last_action_date = actions[0].date_dt if actions else None
+        bill_type = self.bill_type
+
+        if len(actions) > 0:
+            return actions[0].description
+        
+        else:
+            return "New"

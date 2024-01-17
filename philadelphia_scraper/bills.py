@@ -160,7 +160,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
         return possible_classification
 
 
-    def scrape(self, search_text: str='qualified electors', created_after: date | None = date(2023,1,1), created_before: date | None = date(2023,2,28) ) -> Generator[Bill | VoteEvent, None, None]:
+    def scrape(self, search_text: str | None = None, created_after: date | None = date(2023,9,1), created_before: date | None = None ) -> Generator[Bill | VoteEvent, None, None]:
         """
         
         LegistarBillsScraper.legislation() is going to yield bills as dicts.
