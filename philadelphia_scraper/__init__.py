@@ -22,6 +22,12 @@ class Philadelphia(Jurisdiction):
 
     legislative_sessions = [
         {
+            "identifier": "2024",
+            "name": "2024 Regular Session",
+            "start_date": "2024-01-01",
+            "end_date": "2024-12-31",
+        },
+        {
             "identifier": "2023",
             "name": "2023 Regular Session",
             "start_date": "2023-05-20",

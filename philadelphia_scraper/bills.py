@@ -160,7 +160,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
         return possible_classification
 
 
-    def scrape(self, search_text: str | None = None, created_after: date | None = date(2023,9,1), created_before: date | None = None ) -> Generator[Bill | VoteEvent, None, None]:
+    def scrape(self, search_text: str | None = None, created_after: date | None = date(2023,11,1), created_before: date | None = None ) -> Generator[Bill | VoteEvent, None, None]:
         """
         
         LegistarBillsScraper.legislation() is going to yield bills as dicts.
@@ -249,6 +249,17 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
             bill.extras["html_text"] = str(etree.tostring(bill_text))
             bill.extras["plain_text"] = bill_text.text_content()
             bill.add_document_link(url=url, note=f"Text, {idx}", text=bill_text.text_content(), media_type="plain_text")  
+
+
+
+        sponsor_names = [sponsor_.strip() for sponsor_ in sponsors_span[0].text_content().split(",")]
+
+        for sponsor_name in sponsor_names:
+            bill.add_sponsorship(
+                    name = sponsor_name,
+                    classification = "legislation",
+                    entity_type="person",
+                    primary=True)
 
         return bill
 

@@ -18,3 +18,9 @@ class PhilaBillIndex(BillIndex, indexes.Indexable):
 
     def prepare_actions(self, obj):
         return [str(action) for action in obj.actions.all()]
+
+    def prepare_sponsorships(self, obj):
+        return [
+            str(sponsorship.person)
+            for sponsorship in obj.sponsorships.filter(primary=True)
+        ]

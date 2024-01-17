@@ -45,7 +45,7 @@ class PhiladelphiaCommitteeScraper(Scraper):
         committees = doc.xpath(committee_els)
     
         # TODO set the term end date in a real way.
-        term_end_date = date(2024,1,1)
+        term_end_date = date(2024,12,30)
 
         for el in committees:
             try:
