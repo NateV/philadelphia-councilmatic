@@ -160,7 +160,7 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
         return possible_classification
 
 
-    def scrape(self, search_text: str | None = None, created_after: date | None = date(2023,11,1), created_before: date | None = None ) -> Generator[Bill | VoteEvent, None, None]:
+    def scrape(self, search_text: str | None = "", window: int = 14) -> Generator[Bill | VoteEvent, None, None]:
         """
         
         LegistarBillsScraper.legislation() is going to yield bills as dicts.
@@ -170,8 +170,12 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
 
         This method goes over the summary list of legislation at https://phila.legistar.com/legislation.aspx
         """
+        
+        created_after = date.today() - datetime.timedelta(days = window)
+        created_before = date.today()
+
         bill: Dict
-        for bill in self.legislation(created_after=created_after, created_before=created_before, search_text=search_text):
+        for bill in self.legislation(created_after=created_after, created_before=created_before, search_text=search_text or ""):
         
 
             # so scrape needs to yield to ... what?

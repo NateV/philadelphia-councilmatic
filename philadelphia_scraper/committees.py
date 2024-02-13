@@ -49,7 +49,7 @@ class PhiladelphiaCommitteeScraper(Scraper):
 
         for el in committees:
             try:
-                committee_name = el.xpath("./div/a/span")[0].text
+                committee_name = el.xpath("./div/a/span")[0].text.strip()
                 if committee_name is None:
                     committee_name = el.xpath("./div/a/span")[0].text_content().strip()
                 if committee_name is None:
@@ -101,7 +101,7 @@ class PhiladelphiaCommitteeScraper(Scraper):
             members_path = ".//h6[contains(text(), 'Members (Consisting of ')]/following-sibling::p[1]"
             try:
                 members = repair_names(
-                    [m.strip() for m in el.xpath(members_path)[0].text.split(",")]
+                    [m.strip() for m in el.xpath(members_path)[0].text.split(",") if m.strip() is not ""]
                     ) 
 
                 for m in members:

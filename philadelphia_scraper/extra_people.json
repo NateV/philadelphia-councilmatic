@@ -7,12 +7,29 @@
             "terms":[
                 {
                     "role": "Member",
-                    "label":"Councilmember at Large (6)",
+                    "label":"Councilmember at Large",
                     "org_classification":"legislature",
-                    "district":"Councilmember at Large (6)",
+                    "district":"Councilmember at Large",
                     "end_date":"2023-02-13"
                 }
             ]
-        } 
+        },
+        {
+            "name": "Nicolas O'Rourke",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Seal_of_Philadelphia%2C_Pennsylvania.svg/170px-Seal_of_Philadelphia%2C_Pennsylvania.svg.png",
+            "family_name": "O'Rourke",
+            "additional_names": [
+                "Nicolas O’Rourke"
+            ]
+        },
+        {
+            "name": "Michael Driscoll",
+            "family_name": "Driscoll",
+            "image": "https://phlcouncil.com/wp-content/uploads/2022/06/134-scaled.jpg",
+            "additional_names": [
+                "Mike Driscoll",
+                "Michael J. Driscoll"
+            ]
+        }
     ]
 }

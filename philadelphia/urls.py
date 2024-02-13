@@ -23,11 +23,14 @@ urlpatterns = [
         views.PhilaBillDetailView.as_view(),
         name='bill_detail',),
     url(r'^search/', CouncilmaticFacetedSearchView(searchqueryset=sqs,
-                                                   form_class=CouncilmaticSearchForm)),
+        form_class=CouncilmaticSearchForm)),
+    url(r'^committees/', views.CommitteesView.as_view()),
     url(
         r"^committee/(?P<slug>[^/]+)/$",
         views.CommitteeDetailView.as_view(),
         name="committee_detail",
+    ),
+    url(r'^council-members/', views.CouncilMembersView.as_view(), name="council_members"
     ),
     url(r"^pdfs/$", views.CORSProxyView.as_view(), name="cors_proxy"),
         ]

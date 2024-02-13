@@ -55,6 +55,14 @@ class CORSProxyView(View):
             return response
 
 
+class CommitteesView(ListView):
+    template_name = "philadelphia/committees.html"
+    context_object_name = "committees"
+
+    def get_queryset(self):
+        return Organization.committees()
+
+
 class CommitteeDetailView(DetailView):
     model = Organization
     template_name = "philadelphia/committee.html"
@@ -101,5 +109,59 @@ class CommitteeDetailView(DetailView):
                         context["user_subscribed_events"] = True
         return context
 
+
+
+class CouncilMembersView(ListView):
+    template_name = "philadelphia/council_members.html"
+    context_object_name = "posts"
+
+    def map(self):
+        map_geojson = {"type": "FeatureCollection", "features": []}
+
+        for post in self.object_list:
+            if post.shape:
+                council_member = "Vacant"
+                detail_link = ""
+                if post.current_member:
+                    council_member = post.current_member.person.name
+                    detail_link = post.current_member.person.slug
+
+                feature = {
+                    "type": "Feature",
+                    "geometry": json.loads(post.shape.json),
+                    "properties": {
+                        "district": post.label,
+                        "council_member": council_member,
+                        "detail_link": "/person/" + detail_link,
+                        "select_id": "polygon-{}".format(slugify(post.label)),
+                    },
+                }
+
+                map_geojson["features"].append(feature)
+
+        return json.dumps(map_geojson)
+
+    def get_queryset(self):
+        get_kwarg = {"name": settings.OCD_CITY_COUNCIL_NAME}
+
+        posts = Organization.objects.get(**get_kwarg).posts.all()
+
+        return posts
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(CouncilMembersView, self).get_context_data(**kwargs)
+        context["seo"] = self.get_seo_blob()
+
+        if settings.MAP_CONFIG:
+            context["map_geojson"] = self.map
+        else:
+            context["map_geojson"] = None
+
+        return context
+
+    def get_seo_blob(self):
+        seo = {}
+        seo.update(settings.SITE_META)
+        return seo
 
 

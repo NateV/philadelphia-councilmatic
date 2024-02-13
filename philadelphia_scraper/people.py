@@ -6,7 +6,7 @@ import re
 import logging
 import json 
 from datetime import date
-from typing import List
+from typing import List, Tuple
 from philadelphia_scraper.utils import (
         name_adjuster,
         from_x,
@@ -15,6 +15,31 @@ from philadelphia_scraper.utils import (
         )
 
 logger = logging.getLogger(__name__)
+
+def find_any_matching_extra_person(person: Person, others: List[Person]) -> Tuple[Person|None, List[Person]]:
+    """
+    Find if there's a person in 'others' that seems to be the sam
+    person as person. 
+
+    if so, split them out of the list of persons.
+
+    """
+    for idx, p in enumerate(others):
+        if person.name.lower().strip() == p.name.lower().strip():
+            return p, others[:idx] + others[idx+1:]
+    return None, others
+
+def merge_people(match: Person, person: Person):
+    """
+    Given two people with the same name, merge _certain_ properties of 'match' into 'person'.
+
+    This doesn't merge terms, for example.
+    """
+    person.family_name = match.family_name
+    person.other_names.extend(match.other_names)
+
+    return person
+
 
 class PhiladelphiaPersonScraper(Scraper):
 
@@ -58,8 +83,38 @@ class PhiladelphiaPersonScraper(Scraper):
         cards_path = "//div[@class='x-card-inner']"
         cards = doc.xpath(cards_path)
 
-        # Ughhhh.
-        at_large_counter = 1
+
+        # If there's a former member who is still listed in committees and hearings,
+        # then we still need to add that person to the database, even if they're 
+        # no longer listed as a council member. 
+        # This extra_people.json file gives us a mechanism for just adding former 
+        # members by hand.
+        # Its also useful for collecting people by hand who have commonly misspelled
+        # names. Or typographical issues like inconsistent use of ' versus ’
+        with open("philadelphia_scraper/extra_people.json","r") as extra_people_file:
+            extra_people = list()
+            extra_data_dict = json.load(extra_people_file)
+            for extra_person_record in extra_data_dict["people"]:
+                extra_p = Person(
+                        extra_person_record['name'],
+                        image=extra_person_record.get('image'))
+                extra_p.family_name = extra_person_record.get('family_name')
+
+                extra_p.add_source(self.COUNCIL_URL)
+
+                for term_record in extra_person_record.get("terms") or []:
+                    extra_p.add_term(
+                        role=term_record["role"],
+                        org_classification=term_record["org_classification"],
+                        label=term_record["label"],
+                        district=term_record["district"],
+                        end_date=term_record["end_date"]
+                        )
+
+                for addl_name in extra_person_record.get('additional_names') or []:
+                    extra_p.add_name(addl_name)
+                extra_people.append(extra_p)
+
 
 
         for card_num, card in enumerate(cards):
@@ -90,7 +145,6 @@ class PhiladelphiaPersonScraper(Scraper):
 #
 #        for url, name, district, title, pic in zip(urls, names, districts, titles, images, strict=True):
 #
-            #if re.search(r"Harrity", name,flags=re.I): breakpoint()
             last_name = get_last_name(name)
 
             # Create legislator.
@@ -104,6 +158,19 @@ class PhiladelphiaPersonScraper(Scraper):
             # I don't know what to do for names that have family name as not last.
             # We need the family name because legislation is linked to people in legistar only by 'CouncilMember [last name]'.
             person.family_name = last_name
+            # use add_name to add Councilmember xxx so that pupa will be able 
+            # to tell that "Councilmember xxx" refers to the right person.
+            person.add_name(f"Councilmember {last_name}")
+            
+            if re.search("’",person.family_name):
+                #the name has a curly apostrophe in it, and we want to be able to 
+                # match them if their name is recorded with a '
+                # which is what Legistar does.
+                alt_family_name = re.sub("’",person.family_name,"'")
+                person.add_name(f"Councilmember {alt_family_name}")
+
+                alt_name = re.sub("’",person.name,"'")
+                person.add_name(alt_name)
 
             # Add membership on council.
             # is this a mistake, since we're also adding roles?
@@ -138,30 +205,30 @@ class PhiladelphiaPersonScraper(Scraper):
                 # at large members w/out districts.
                 person.add_term(role="Member",
                     org_classification="legislature",
-                    label=f"Councilmember at Large ({at_large_counter})",
-                    district=f"Councilmember at Large ({at_large_counter})",
+                    label=f"Councilmember at Large",
+                    district=f"Councilmember at Large",
                     end_date="2025-01-01")
-                at_large_counter += 1
 
          
             # TODO sould leadership titles be 'roles', not Posts?
             if (council_title.upper() in ["COUNCIL PRESIDENT"]):
                 person.add_term(
-                        role="Member",
+                        role="Council President",
                         org_classification="legislature",
-                        label=council_title.title(),
-                        district=council_title.title(),
+                        label="Council President",
+                        start_date="2024-01-01",
                         end_date="2025-01-01")
                 person.add_name(f"Council President {last_name}")
 
 
             if (whip_title.upper() in ["MAJORITY WHIP"]):
                 person.add_term(
-                        role="Member",
+                        role="Majority Whip",
                         org_classification="legislature",
-                        label=whip_title.title(),
-                        district=whip_title.title(),
+                        label="Majority Whip",
+                        start_date="2024-01-01",
                         end_date="2025-01-01")
+                person.add_name(f"Majority Whip {last_name}")
 
 
             # TODO Phila site's contact info is a little tedious to parse
@@ -174,33 +241,15 @@ class PhiladelphiaPersonScraper(Scraper):
 
             # Add sources.
             person.add_source(url)
+
+            match, extra_people = find_any_matching_extra_person(person, extra_people)
+            if match is not None:
+                person = merge_people(match, person)
+
             yield person
 
-        # If there's a former member who is still listed in committees and hearings,
-        # then we still need to add that person to the database, even if they're 
-        # no longer listed as a council member. 
-        # This extra_people.json file gives us a mechanism for just adding former 
-        # members by hand.
-        with open("philadelphia_scraper/extra_people.json","r") as extra_people_file:
-            extra_people = json.load(extra_people_file)
-            for extra_person_record in extra_people["people"]:
-                extra_p = Person(
-                        extra_person_record['name'],
-                        image=extra_person_record['image'])
-                extra_p.family_name = extra_person_record['family_name']
 
-                extra_p.add_source(self.COUNCIL_URL)
-
-                for term_record in extra_person_record["terms"]:
-                    extra_p.add_term(
-                        role=term_record["role"],
-                        org_classification=term_record["org_classification"],
-                        label=term_record["label"],
-                        district=term_record["district"],
-                        end_date=term_record["end_date"]
-                        )
-                yield extra_p
-
-
-
+        # if anyody is left in extra_people, yield them too.
+        for remaining_person in extra_people:
+            yield remaining_person
 
