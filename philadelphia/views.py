@@ -118,7 +118,10 @@ class CouncilMembersView(ListView):
     def map(self):
         map_geojson = {"type": "FeatureCollection", "features": []}
 
-        for post in self.object_list:
+        get_kwarg = {"name": settings.OCD_CITY_COUNCIL_NAME}
+        
+        posts = Organization.objects.get(**get_kwarg).posts.all()
+        for post in posts:
             if post.shape:
                 council_member = "Vacant"
                 detail_link = ""
@@ -145,8 +148,13 @@ class CouncilMembersView(ListView):
         get_kwarg = {"name": settings.OCD_CITY_COUNCIL_NAME}
 
         posts = Organization.objects.get(**get_kwarg).posts.all()
+            
+        posts_ = []
+        for post in posts:
+            # TODO limit to current post-holders.
+            posts_.extend([post for post in post.memberships.all()])
 
-        return posts
+        return posts_
 
     def get_context_data(self, *args, **kwargs):
         context = super(CouncilMembersView, self).get_context_data(**kwargs)

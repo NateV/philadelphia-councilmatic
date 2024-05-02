@@ -30,7 +30,7 @@ urlpatterns = [
         views.CommitteeDetailView.as_view(),
         name="committee_detail",
     ),
-    url(r'^council-members/', views.CouncilMembersView.as_view(), name="council_members"
+    url(r'^council-members/$', views.CouncilMembersView.as_view(), name="council_members"
     ),
     url(r"^pdfs/$", views.CORSProxyView.as_view(), name="cors_proxy"),
         ]
