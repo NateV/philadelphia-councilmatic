@@ -14,8 +14,8 @@ class Philadelphia(Jurisdiction):
     name = "City of Philadelphia"
     url = "https://phlcouncil.com/"
     scrapers = {
-        #"events": PhiladelphiaEventScraper,
-        "people": PhiladelphiaPersonScraper,
+        "events": PhiladelphiaEventScraper,
+        #"people": PhiladelphiaPersonScraper,
         #"bills": PhiladelphiaBillScraper,
         #"committees": PhiladelphiaCommitteeScraper,
     }
@@ -51,12 +51,11 @@ class Philadelphia(Jurisdiction):
     
         # There are 6 at-larges - 
         # TODO what is the proper way to handle multi-seat 'Posts'?
-        for at_large in range(1,8):
-           org.add_post(
-                   label=f"Councilmember at Large",
-                   role="Member")
+        org.add_post(
+               label=f"Councilmember at Large",
+               role="Member",
+               maximum_memberships=7)
    
 
 
-        #REQUIRED: yield the organization
         yield org

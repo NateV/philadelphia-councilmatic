@@ -183,10 +183,11 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
             if bill['Type'] not in ["COMMUNICATION", "Resolution"]:
                 # This isn't a bill, but a note from somebody to Council.
                 # TODO - do something about Resolutions?
-
                        
                 identifier = bill['File\xa0#']
                 title = bill['Title']
+                if title.strip() == '': 
+                    title = f"No title for bill {identifier}"
                 
                 classification = (bill.get('Type') or "").strip().lower()
 
@@ -256,14 +257,15 @@ class PhiladelphiaBillScraper(LegistarBillScraper, Scraper):
 
 
 
-        sponsor_names = [sponsor_.strip() for sponsor_ in sponsors_span[0].text_content().split(",")]
+        if len(sponsors_span) > 0:
+            sponsor_names = [sponsor_.strip() for sponsor_ in sponsors_span[0].text_content().split(",")]
 
-        for sponsor_name in sponsor_names:
-            bill.add_sponsorship(
-                    name = sponsor_name,
-                    classification = "legislation",
-                    entity_type="person",
-                    primary=True)
+            for sponsor_name in sponsor_names:
+                bill.add_sponsorship(
+                        name = sponsor_name,
+                        classification = "legislation",
+                        entity_type="person",
+                        primary=True)
 
         return bill
 

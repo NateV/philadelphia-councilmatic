@@ -242,6 +242,10 @@ class PhiladelphiaPersonScraper(Scraper):
             # Add sources.
             person.add_source(url)
 
+            # Now we will look at the list of 'extra people'.
+            # Some of these are people we'll also find by 
+            # scraping, and we need to combine their info.
+            # I do this to handle weird spelling issues.
             match, extra_people = find_any_matching_extra_person(person, extra_people)
             if match is not None:
                 person = merge_people(match, person)
