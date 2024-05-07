@@ -5,6 +5,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
+from typing import List, Tuple
 
 class PhilaBillDetailView(BillDetailView):
     model = PhilaBill
@@ -109,6 +110,16 @@ class CommitteeDetailView(DetailView):
                         context["user_subscribed_events"] = True
         return context
 
+def expand_posts(posts: List[Post]) -> List[Tuple[Post, Membership]]:
+    """
+    From a list of posts, expand to a list mapping posts
+    to current members.
+    """
+    posts_ = []
+    for post in posts:
+        current_members = post.memberships.filter(end_date_dt__gt=timezone.now())
+        posts_.append((post, current_members))
+    return posts_
 
 
 class CouncilMembersView(ListView):
@@ -148,12 +159,9 @@ class CouncilMembersView(ListView):
         get_kwarg = {"name": settings.OCD_CITY_COUNCIL_NAME}
 
         posts = Organization.objects.get(**get_kwarg).posts.all()
-            
-        posts_ = []
-        for post in posts:
-            # TODO limit to current post-holders.
-            posts_.extend([post for post in post.memberships.all()])
-
+        # We have posts w/ multiple members simultaneously. So 
+        # instead of posts, we need to expand posts to a mapping of post:[current members]
+        posts_ = expand_posts(posts)
         return posts_
 
     def get_context_data(self, *args, **kwargs):

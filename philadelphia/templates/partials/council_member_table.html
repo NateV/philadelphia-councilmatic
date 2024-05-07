@@ -14,28 +14,29 @@
             </tr>
         </thead>
         <tbody>
-            {% for post in posts %}
-                <tr id="polygon-{{post.label | slugify}}">
-                    <td>
-                        {% if post.current_member %}
+            {% for post, members in posts %}
+                {% for member in members %}
+                    <tr id="polygon-{{post.label | slugify}}">
+                        <td>
                             <div class="thumbnail-square">
-                                <img src='{% static post.current_member.person.headshot.url %}' alt='{{post.current_member.person.name}}' title='{{post.current_member.person.name}}' class='img-responsive img-thumbnail' />
+                                    <img src='{% static member.person.headshot.url %}' alt='{{member.person.name}}' title='{{member.person.name}}' class='img-responsive img-thumbnail' />
                             </div>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if post.current_member %}
-                            {{ post.current_member.person.link_html|safe }}
-                            {% if post.current_member.role == 'Speaker' %}
+                        </td>
+                        <td>
+                            {{ member.person.link_html|safe }}
+                            {% if member.role == 'Speaker' %}
                                 <br /><span class='label label-default'>Council Speaker</span>
-                                <span class='label label-success'><i class='fa fa-fw fa-check-square-o'></i> Verified</span>
                             {% endif %}
-                        {% else %}
-                            Vacant
-                        {% endif %}
-                    </td>
-                    <td>{{post.label}}</td>
-                </tr>
+                        </td>
+                        <td>{{post.label}}</td>
+                    </tr>
+                {% empty %}
+                    <tr id="polygon-{{post.label | slugify}}">
+                        <td/>
+                        <td> Vacant </td>
+                        <td>{{post.label}}</td>
+                    </tr>
+                {% endfor %}
             {% endfor %}
         </tbody>
     </table>
