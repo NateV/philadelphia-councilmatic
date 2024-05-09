@@ -117,7 +117,9 @@ def expand_posts(posts: List[Post]) -> List[Tuple[Post, Membership]]:
     """
     posts_ = []
     for post in posts:
-        current_members = post.memberships.filter(end_date_dt__gt=timezone.now())
+        current_members = post.memberships.filter(
+                start_date_dt__lt=timezone.now(),
+                end_date_dt__gt=timezone.now())
         posts_.append((post, current_members))
     return posts_
 
@@ -179,5 +181,32 @@ class CouncilMembersView(ListView):
         seo = {}
         seo.update(settings.SITE_META)
         return seo
+
+
+class EventDetailView(DetailView):
+    template_name = "philadelphia/event.html"
+    model = Event
+    context_object_name = "event"
+
+    def get_context_data(self, **kwargs):
+        context = super(EventDetailView, self).get_context_data(**kwargs)
+        event = context["event"]
+
+        event.source_url = event.sources.all()[0].url
+
+            
+        participants = [p.entity_name for p in event.participants.all()]
+        context["participants"] = Organization.objects.filter(name__in=participants)
+
+        seo = {}
+        seo.update(settings.SITE_META)
+        seo["site_desc"] = (
+            "Public city council event on %s/%s/%s - view event participants & agenda items"
+            % (event.start_time.month, event.start_time.day, event.start_time.year)
+        )
+        seo["title"] = "%s Event - %s" % (event.name, settings.SITE_META["site_name"])
+        context["seo"] = seo
+
+        return context
 
 
