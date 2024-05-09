@@ -16,6 +16,10 @@ from philadelphia_scraper.utils import (
 
 logger = logging.getLogger(__name__)
 
+# TODO figure out current term official start and end dates
+CURRENT_TERM_START="2024-01-01"
+CURRENT_TERM_END="2024-12-31"
+
 def find_any_matching_extra_person(person: Person, others: List[Person]) -> Tuple[Person|None, List[Person]]:
     """
     Find if there's a person in 'others' that seems to be the sam
@@ -65,8 +69,7 @@ class PhiladelphiaPersonScraper(Scraper):
         # nb. the . at the start of each path makes the search relative.
         name_xpath = ".//h4[@class='x-face-title']/strong"
         # where the data is written on front and back of the card, pick one.
-        council_title_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/strong/big" # the 'Whip' or 'Leader' title, if any. 
-        whip_title_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/big/strong" # the 'Whip' or 'Leader' title, if any. 
+        subtitle_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/strong/big" # the 'Whip' or 'Leader' title, if any. 
         district_xpath = ".//div[@class='x-face-outer front']//p[@class='x-face-text']/strong" # district, not the 'Whip' or 
         link_xpath = ".//a[@class='x-face-button']/@href"
         pic_path = ".//div[@class='x-face-graphic']/img/@src"
@@ -76,7 +79,7 @@ class PhiladelphiaPersonScraper(Scraper):
 
         html = response.text
         doc = lxml.html.fromstring(html)
-
+            
  
         # philly's council site has members on 'cards'. We'll iterate over each card to make sure
         # we catch those that are vacant and keep all the data points together.
@@ -108,6 +111,7 @@ class PhiladelphiaPersonScraper(Scraper):
                         org_classification=term_record["org_classification"],
                         label=term_record["label"],
                         district=term_record["district"],
+                        start_date=term_record.get("start_date"),
                         end_date=term_record["end_date"]
                         )
 
@@ -126,25 +130,10 @@ class PhiladelphiaPersonScraper(Scraper):
                 continue
             url = from_x(card.xpath(link_xpath))
             url = f"{self.COUNCIL_ROOT}{url}"
-            district = from_x(card.xpath(district_xpath))
-            whip_title = from_x(card.xpath(whip_title_xpath))
-            council_title = from_x(card.xpath(council_title_xpath))
+            subtitle = from_x(card.xpath(subtitle_xpath))
             pic = from_x(card.xpath(pic_path))
-#       
-#        # the urls of the council people
-#        urls = [f"{self.COUNCIL_ROOT}{end_part}" for end_part in doc.xpath(link_xpath)]
-#        names = [el.text for el in doc.xpath(name_xpath)]
-#        districts = [el.text for el in doc.xpath(district_xpath)]
-#        titles = [el.text for el in doc.xpath(title_xpath)]
-#        pad_list(titles, names, "")
-#
-#        images = doc.xpath(pic_path)
-#
             dist_pat = re.compile(r"^DISTRICT (?P<distnum>\d+)$")
-#
-#
-#        for url, name, district, title, pic in zip(urls, names, districts, titles, images, strict=True):
-#
+            district = from_x(card.xpath(district_xpath))
             last_name = get_last_name(name)
 
             # Create legislator.
@@ -180,6 +169,7 @@ class PhiladelphiaPersonScraper(Scraper):
             # 1 Council member. 
 
 
+            
 
             match = dist_pat.match(district or "")
 
@@ -199,7 +189,8 @@ class PhiladelphiaPersonScraper(Scraper):
                     district=f"District {dist_num} Councilmember",
                     # NB end_date is REQUIRED. The councilmember querset won't find any council members
                     # if the end dates for their terms aren't set.
-                    end_date = "2025-01-01")
+                    start_date = CURRENT_TERM_START,
+                    end_date = CURRENT_TERM_END)
 
             else:
                 # at large members w/out districts.
@@ -207,11 +198,12 @@ class PhiladelphiaPersonScraper(Scraper):
                     org_classification="legislature",
                     label=f"Councilmember at Large",
                     district=f"Councilmember at Large",
-                    end_date="2025-01-01")
+                    start_date = CURRENT_TERM_START,
+                    end_date = CURRENT_TERM_END)
 
          
             # TODO sould leadership titles be 'roles', not Posts?
-            if (council_title.upper() in ["COUNCIL PRESIDENT"]):
+            if re.search("COUNCIL PRESIDENT",subtitle.strip(), re.I):
                 # Why do council pres and other leadership roles
                 # not get memberships connected so they show up on the list-legislator view?
                 person.add_term(
@@ -228,8 +220,7 @@ class PhiladelphiaPersonScraper(Scraper):
                 person.add_name(f"Council President {last_name}")
 
 
-            if (whip_title.upper() in ["MAJORITY WHIP"]):
-                breakpoint()
+            if re.search("MAJORITY WHIP", subtitle.strip(), re.I):
                 person.add_term(
                         role="Majority Whip",
                         org_classification="legislature",

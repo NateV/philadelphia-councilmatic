@@ -10,6 +10,7 @@
                     "label":"Councilmember at Large",
                     "org_classification":"legislature",
                     "district":"Councilmember at Large",
+                    "start_date": "2023-01-01",
                     "end_date":"2023-02-13"
                 }
             ]

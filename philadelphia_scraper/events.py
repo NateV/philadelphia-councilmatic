@@ -65,8 +65,8 @@ class PhiladelphiaEventScraper(Scraper):
                     start_date=date_,
                     location_name=location,
                     )
-            if agenda != "":
-                e.add_source(agenda)
+            if details_url != "":
+                e.add_source(url=details_url)
             else:
                 e.add_source(self.CALENDAR)
 
@@ -100,7 +100,6 @@ class PhiladelphiaEventScraper(Scraper):
                 for idx, bill_action in enumerate(bill_actions):
                     file_numL = bill_action.xpath("./td[1]/font/a/font")
                     file_num = content_from_x(file_numL)
-                    if file_num == "": breakpoint()
                     doc_typeL = bill_action.xpath("./td[5]")
                     doc_type = content_from_x(doc_typeL)
                     doc_titleL = bill_action.xpath("./td[6]")
