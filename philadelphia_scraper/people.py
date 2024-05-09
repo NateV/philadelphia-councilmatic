@@ -212,20 +212,29 @@ class PhiladelphiaPersonScraper(Scraper):
          
             # TODO sould leadership titles be 'roles', not Posts?
             if (council_title.upper() in ["COUNCIL PRESIDENT"]):
+                # Why do council pres and other leadership roles
+                # not get memberships connected so they show up on the list-legislator view?
                 person.add_term(
                         role="Council President",
                         org_classification="legislature",
                         label="Council President",
+                        # This label-as-district is necessary
+                        # because pupa/scrape/popolo.py
+                        # needs a way to make a pseudo id
+                        # for the Post
+                        district="Council President",
                         start_date="2024-01-01",
                         end_date="2025-01-01")
                 person.add_name(f"Council President {last_name}")
 
 
             if (whip_title.upper() in ["MAJORITY WHIP"]):
+                breakpoint()
                 person.add_term(
                         role="Majority Whip",
                         org_classification="legislature",
                         label="Majority Whip",
+                        district="Majority Whip",
                         start_date="2024-01-01",
                         end_date="2025-01-01")
                 person.add_name(f"Majority Whip {last_name}")
