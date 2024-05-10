@@ -5,7 +5,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
-from typing import List, Tuple
+from typing import List, Tuple, TypeVar
 
 class PhilaBillDetailView(BillDetailView):
     model = PhilaBill
@@ -110,7 +110,7 @@ class CommitteeDetailView(DetailView):
                         context["user_subscribed_events"] = True
         return context
 
-def expand_posts(posts: List[Post]) -> List[Tuple[Post, Membership]]:
+def expand_posts(posts: List[Post]) -> List[Tuple[Post, List[Membership]]]:
     """
     From a list of posts, expand to a list mapping posts
     to current members.
@@ -122,6 +122,23 @@ def expand_posts(posts: List[Post]) -> List[Tuple[Post, Membership]]:
                 end_date_dt__gt=timezone.now())
         posts_.append((post, current_members))
     return posts_
+
+A = TypeVar('A')
+B = TypeVar('B')
+
+def invert_map(dct: List[Tuple[A,List[B]]]) -> List[Tuple[B,List[A]]]:
+    """
+    Given a list that is a map from some type A to lists of some type B,
+    invert the map to a list of tuples mapping from B to lists of A
+    """
+    temp_dict = dict()
+    for a, bs in dct:
+        for b in bs:
+            if temp_dict.get(b) is None:
+                temp_dict[b] = [a]
+            else:
+                temp_dict[b].append(a)
+    return [(a, bs) for a, bs in temp_dict.items()]
 
 
 class CouncilMembersView(ListView):
@@ -164,6 +181,9 @@ class CouncilMembersView(ListView):
         # We have posts w/ multiple members simultaneously. So 
         # instead of posts, we need to expand posts to a mapping of post:[current members]
         posts_ = expand_posts(posts)
+        # TODO how do we both show VACANT Posts (which implies mapping over all posts),
+        # and show leadership roles for people
+        members = invert_map(posts_)
         return posts_
 
     def get_context_data(self, *args, **kwargs):

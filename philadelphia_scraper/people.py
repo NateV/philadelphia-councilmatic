@@ -183,9 +183,10 @@ class PhiladelphiaPersonScraper(Scraper):
     
 
             if dist_num:
-                person.add_term(role="Member", 
+                rep_label = f"District {dist_num} Councilmember"
+                new_membership = person.add_term(role="Member", 
                     org_classification="legislature",
-                    label=f"District {dist_num} Councilmember", 
+                    label= rep_label, 
                     district=f"District {dist_num} Councilmember",
                     # NB end_date is REQUIRED. The councilmember querset won't find any council members
                     # if the end dates for their terms aren't set.
@@ -194,9 +195,10 @@ class PhiladelphiaPersonScraper(Scraper):
 
             else:
                 # at large members w/out districts.
-                person.add_term(role="Member",
+                rep_label = f"Councilmember at Large"
+                new_membership = person.add_term(role="Member",
                     org_classification="legislature",
-                    label=f"Councilmember at Large",
+                    label= rep_label,
                     district=f"Councilmember at Large",
                     start_date = CURRENT_TERM_START,
                     end_date = CURRENT_TERM_END)
@@ -204,31 +206,42 @@ class PhiladelphiaPersonScraper(Scraper):
          
             # TODO sould leadership titles be 'roles', not Posts?
             if re.search("COUNCIL PRESIDENT",subtitle.strip(), re.I):
-                # Why do council pres and other leadership roles
-                # not get memberships connected so they show up on the list-legislator view?
-                person.add_term(
-                        role="Council President",
-                        org_classification="legislature",
-                        label="Council President",
-                        # This label-as-district is necessary
-                        # because pupa/scrape/popolo.py
-                        # needs a way to make a pseudo id
-                        # for the Post
-                        district="Council President",
-                        start_date="2024-01-01",
-                        end_date="2025-01-01")
-                person.add_name(f"Council President {last_name}")
+                role = "Council President"
+                # Mutate the term we just added to make this person the council pres.
+                new_membership.role = role
+                new_membership.label = f"{role} and {rep_label}"
 
+#                person.add_term(
+#                        role="Council President",
+#                        org_classification="legislature",
+#                        label="Council President",
+#                        # This label-as-district is necessary
+#                        # because pupa/scrape/popolo.py
+#                        # needs a way to make a pseudo id
+#                        # for the Post
+#                        district="Council President",
+#                        start_date="2024-01-01",
+#                        end_date="2025-01-01")
+
+                # And add their title with name because they are often identified 
+                # that way in bills or other places.
+                person.add_name(f"Council President {last_name}")
+#
 
             if re.search("MAJORITY WHIP", subtitle.strip(), re.I):
-                person.add_term(
-                        role="Majority Whip",
-                        org_classification="legislature",
-                        label="Majority Whip",
-                        district="Majority Whip",
-                        start_date="2024-01-01",
-                        end_date="2025-01-01")
-                person.add_name(f"Majority Whip {last_name}")
+               role = "Majority Whip"
+               # Mutate the term we just added to make this person the council pres.
+               new_membership.role = role
+               new_membership.label = f"{role} and {rep_label}"
+
+#               person.add_term(
+#                        role="Majority Whip",
+#                        org_classification="legislature",
+#                        label="Majority Whip",
+#                        district="Majority Whip",
+#                        start_date="2024-01-01",
+#                        end_date="2025-01-01")
+               person.add_name(f"Majority Whip {last_name}")
 
 
             # TODO Phila site's contact info is a little tedious to parse
