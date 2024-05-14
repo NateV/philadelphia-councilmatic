@@ -230,3 +230,99 @@ class EventDetailView(DetailView):
         return context
 
 
+class PersonDetailView(DetailView):
+    model = Person
+    template_name = "philadelphia/person.html"
+    context_object_name = "person"
+
+    def get_context_data(self, **kwargs):
+        context = super(PersonDetailView, self).get_context_data(**kwargs)
+
+        person = context["person"]
+        person.source_url = person.sources.all()[0].url
+        context["sponsored_legislation"] = (
+            Bill.objects.filter(sponsorships__person=person, sponsorships__primary=True)
+            .annotate(last_action=Max("actions__date"))
+            .order_by("-last_action")[:10]
+        )
+
+        title = ""
+        if person.current_council_seat:
+            title = "%s %s" % (
+                person.current_council_seat,
+                settings.CITY_VOCAB["COUNCIL_MEMBER"],
+            )
+        elif person.latest_council_seat:
+            title = "Former %s, %s" % (
+                settings.CITY_VOCAB["COUNCIL_MEMBER"],
+                person.latest_council_seat,
+            )
+        elif (
+            getattr(settings, "EXTRA_TITLES", None)
+            and person.slug in settings.EXTRA_TITLES
+        ):
+            title = settings.EXTRA_TITLES[person.slug]
+        context["title"] = title
+
+        seo = {}
+        seo.update(settings.SITE_META)
+        if person.current_council_seat:
+            short_name = re.sub(r",.*", "", person.name)
+            seo[
+                "site_desc"
+            ] = "%s - %s representative in %s. See what %s has been up to!" % (
+                person.name,
+                person.current_council_seat,
+                settings.CITY_COUNCIL_NAME,
+                short_name,
+            )
+        else:
+            seo["site_desc"] = "Details on %s, %s" % (
+                person.name,
+                settings.CITY_COUNCIL_NAME,
+            )
+        seo["title"] = "%s - %s" % (person.name, settings.SITE_META["site_name"])
+        seo["image"] = static(person.headshot.url)
+        context["seo"] = seo
+
+        context["map_geojson"] = None
+
+        if (
+            settings.MAP_CONFIG
+            and person.latest_council_membership
+            and person.latest_council_membership.post
+            and person.latest_council_membership.post.shape
+        ):
+            map_geojson = {"type": "FeatureCollection", "features": []}
+
+            feature = {
+                "type": "Feature",
+                "geometry": json.loads(
+                    person.latest_council_membership.post.shape.json
+                ),
+                "properties": {
+                    "district": person.latest_council_membership.post.label,
+                },
+            }
+
+            map_geojson["features"].append(feature)
+
+            context["map_geojson"] = json.dumps(map_geojson)
+
+        context["user_subscribed"] = False
+
+        if settings.USING_NOTIFICATIONS:
+            if self.request.user.is_authenticated:
+                user = self.request.user
+                context["user"] = user
+                # check if person of interest is subscribed to by user
+
+                for ps in user.personsubscriptions.all():
+                    if person == ps.person:
+                        context["user_subscribed"] = True
+                        break
+
+        return context
+
+
+

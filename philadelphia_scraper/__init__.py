@@ -17,7 +17,7 @@ class Philadelphia(Jurisdiction):
         #"events": PhiladelphiaEventScraper,
         "people": PhiladelphiaPersonScraper,
         #"bills": PhiladelphiaBillScraper,
-        #"committees": PhiladelphiaCommitteeScraper,
+        "committees": PhiladelphiaCommitteeScraper,
     }
 
     legislative_sessions = [
@@ -44,13 +44,10 @@ class Philadelphia(Jurisdiction):
         org.add_source(self.url)
        
         # See https://www.popoloproject.com/specs/post.html
-        org.add_post(label="Council President", role="Council President")
-        org.add_post(label="Majority Whip", role="Majority Whip")
         for dist in range(1,11):
             org.add_post(label=f"District {dist} Councilmember", role=f"Member")
     
-        # There are 6 at-larges - 
-        # TODO what is the proper way to handle multi-seat 'Posts'?
+        # There are 7 at-larges - 
         org.add_post(
                label=f"Councilmember at Large",
                role="Member",

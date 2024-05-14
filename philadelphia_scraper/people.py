@@ -104,7 +104,6 @@ class PhiladelphiaPersonScraper(Scraper):
                 extra_p.family_name = extra_person_record.get('family_name')
 
                 extra_p.add_source(self.COUNCIL_URL)
-
                 for term_record in extra_person_record.get("terms") or []:
                     extra_p.add_term(
                         role=term_record["role"],
@@ -160,7 +159,6 @@ class PhiladelphiaPersonScraper(Scraper):
 
                 alt_name = re.sub("’",person.name,"'")
                 person.add_name(alt_name)
-
             # Add membership on council.
             # is this a mistake, since we're also adding roles?
             #person.add_membership(council)

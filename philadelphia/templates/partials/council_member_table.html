@@ -24,9 +24,13 @@
                         </td>
                         <td>
                             {{ member.person.link_html|safe }}
-                            {% if member.role == 'Speaker' %}
-                                <br /><span class='label label-default'>Council Speaker</span>
+                            {% if member.role == 'Council President' %}
+                                <br /><span class='label label-default'>Council President</span>
                             {% endif %}
+                            {% if member.role == 'Majority Whip' %}
+                                <br /><span class='label label-default'>Majority Whip</span>
+                            {% endif %}
+
                         </td>
                         <td>{{post.label}}</td>
                     </tr>
