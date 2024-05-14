@@ -7,7 +7,8 @@ from councilmatic_core.models import (
    Membership,
    Event,
    Bill,
-   Person)
+   Person,
+   Post)
 
 
 
