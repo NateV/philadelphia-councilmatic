@@ -14,4 +14,4 @@ INSTALLED_APPS = (
     'councilmatic_core'
 )
 
-DATABASE_URL = os.environ['DBURL']
+DATABASE_URL = os.environ['DATABASE_URL']
