@@ -22,8 +22,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Edit this and add your domain when deploying.
-ALLOWED_HOSTS = [
-    'localhost', '127.0.0.1'
+if IS_HEROKU_APP:
+    ALLOWED_HOSTS = ["*"]
+else:
+
+    ALLOWED_HOSTS = [
+        'localhost', '127.0.0.1'
     ]
 
 
@@ -63,6 +67,7 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
