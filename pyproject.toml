@@ -12,12 +12,15 @@ python = "^3.10"
 django-councilmatic = {git="https://github.com/NateV/django-councilmatic.git", rev="e15fcfa"} 
 opencivicdata = {git = "https://github.com/opencivicdata/python-opencivicdata.git", rev="d5520de"}
 psycopg = {extras = ["binary"], version = "^3.1.9"}
-pupa = {path="../pupa", develop=true}#"^0.11.0"
+pupa = {git="https://github.com/NateV/pupa.git", rev="b969c92"}
 django-adv-cache-tag = "==1.1.2"
 django-haystack = {extras = ["elasticsearch"], version = "^3.2.1"}
 legistar = {git="https://github.com/NateV/python-legistar-scraper.git",rev="77d3d8c"}
-certifi = "^2023.07.22"
+certifi = "==2023.07.22"
 pytz = "==2024.1"
+gunicorn = "==22.0.0"
+dj-database-url = "==2.1.0"
+whitenoise = "^6.6.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
