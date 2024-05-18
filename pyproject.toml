@@ -2,22 +2,20 @@
 name = "phila-councilmatic"
 version = "0.0.1"
 description = "Philadelphia specific version of the datamade/councilmatic-starter-template"
-authors = ["Your Name <you@example.com>"]
+authors = ["Nate Vogel <you@example.com>", "Datamade"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "phila_councilmatic"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-django-councilmatic = {path="../django-councilmatic", develop=true}
-#django-councilmatic = ">=2.5.4"
-opencivicdata = {path="../python-opencivicdata", develop=true}
+django-councilmatic = {git="https://github.com/NateV/django-councilmatic.git", rev="e15fcfa"} 
+opencivicdata = {git = "https://github.com/opencivicdata/python-opencivicdata.git", rev="d5520de"}
 psycopg = {extras = ["binary"], version = "^3.1.9"}
-pysolr = "^3.9.0"
 pupa = {path="../pupa", develop=true}#"^0.11.0"
 django-adv-cache-tag = "==1.1.2"
 django-haystack = {extras = ["elasticsearch"], version = "^3.2.1"}
-legistar = {path = "../python-legistar-scraper", develop = true} #"^0.0.1"
+legistar = {git="https://github.com/NateV/python-legistar-scraper.git",rev="77d3d8c"}
 certifi = "^2023.07.22"
 pytz = "==2024.1"
 
