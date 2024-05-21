@@ -23,6 +23,30 @@ Enjoy learning about Philadelphia's City Council from the comfort of your localh
 
 ## Running in production
 
+We're set up to run in Heroku.
+
+First create an application. 
+
+Add the poetry buildpack. See https://elements.heroku.com/buildpacks/moneymeets/python-poetry-buildpack.
+
+and the gdal buildback too. Install buildpacks in this order: 
+
+```
+heroku buildpacks:clear
+heroku buildpacks:add https://github.com/heroku/heroku-geo-buildpack.git
+heroku buildpacks:add https://github.com/moneymeets/python-poetry-buildpack.git
+heroku buildpacks:add heroku/python
+```
+
+
+
+Add Elasticsearch and Postgres plugins.
+
+Follow heroku's instruction to add your new app as a git remote. 
+
+Add the SECRET\_KEY env var and a FLUSH\_KEY var
+
+Push to deploy to heroku: `git push heroku main`.
 
 
 
