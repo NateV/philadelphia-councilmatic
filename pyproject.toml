@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{include = "phila_councilmatic"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "==3.10.8"
 django-councilmatic = {git="https://github.com/NateV/django-councilmatic.git", rev="e15fcfa"} 
 opencivicdata = {git = "https://github.com/opencivicdata/python-opencivicdata.git", rev="d5520de"}
 psycopg = {extras = ["binary"], version = "^3.1.9"}
