@@ -14,6 +14,7 @@ opencivicdata = {git = "https://github.com/opencivicdata/python-opencivicdata.gi
 psycopg = {extras = ["binary"], version = "^3.1.9"}
 pupa = {git="https://github.com/NateV/pupa.git", rev="b969c92"}
 django-adv-cache-tag = "==1.1.2"
+elasticsearch = "==7.13.4"
 django-haystack = {extras = ["elasticsearch"], version = "^3.2.1"}
 legistar = {git="https://github.com/NateV/python-legistar-scraper.git",rev="77d3d8c"}
 certifi = "==2023.07.22"
