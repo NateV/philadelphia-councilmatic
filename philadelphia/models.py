@@ -72,3 +72,6 @@ class PhilaBill(Bill):
         
         else:
             return "New"
+
+class PupaUpdate(models.Model):
+    update_date = models.DateField()

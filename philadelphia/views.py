@@ -6,6 +6,11 @@ from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
 from typing import List, Tuple, TypeVar
+from django.core.management import call_command, BaseCommand
+import pupa.cli.commands.update as pupa_update
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import os
 
 class PhilaBillDetailView(BillDetailView):
     model = PhilaBill
@@ -325,4 +330,8 @@ class PersonDetailView(DetailView):
         return context
 
 
-
+@method_decorator(csrf_exempt,"dispatch")    
+class UpdateView(View):
+    def post(self, request):
+        os.system('pupa update philadelphia_scraper')
+        return HttpResponse(b"ok")

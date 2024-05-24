@@ -36,5 +36,6 @@ urlpatterns = [
     url(r"^pdfs/$", views.CORSProxyView.as_view(), name="cors_proxy"),
 
     url(r"^event/(?P<slug>.+)/$", views.EventDetailView.as_view(), name="event_detail"),
+    url(r"^update/$", views.UpdateView.as_view(), name="update"),
         ]
 
