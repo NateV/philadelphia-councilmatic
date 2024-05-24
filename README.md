@@ -11,6 +11,16 @@ It may be that some amount of manual tending is necessary for this app to work e
 
 Load env variables with `source .env`.
 
+Set up the database:
+
+Start by creating a database and then using .env.example to create an .env file.
+
+Next, run database migrations:
+```
+pupa dbinit
+./manage.py migrate
+```
+
 Collect recent legislation with `pupa update philadelphia_scraper`
 
 Start an elasticsearch container with `docker-compose up`.
