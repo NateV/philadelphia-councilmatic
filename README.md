@@ -1,10 +1,10 @@
 # Philadelphia Councilmatic
 
-Based on the [Datamade Starter Template](https://github.com/datamade/councilmatic-starter-template)
+This 'Councilmatic' site for legislation of the City Council of Philadelphia is based on the [Datamade Starter Template](https://github.com/datamade/councilmatic-starter-template). Many thanks to the Datamade folks for setting that up!
 
 The council scraper and the django site work well, but not perfectly. There are still a few loose bolts and rough edges, so if you try it out, keep that in mind. 
 
-It may be that some amount of manual tending is necessary for this app to work exactly right. There are many odd things that happen with legilsative data. A Council Person's name may be spelled with a ' character sometimes and a smart-quote other times, for example, or misspelled, or with or without middle names, or many other odd variations that software would have a hard time keeping up with. 
+It may be that some amount of manual tending will always be necessary for this app to work exactly right. There are many odd things that happen with legilsative data. A Council Person's name may be spelled with a ' character sometimes and a smart-quote other times, for example, or misspelled, or with or without middle names, or many other odd variations that software would have a hard time keeping up with. Some human supervision will always be important.
 
 There is no mechanism for auto-updating scraper data so far. As of now, someone needs to manually run `pupa update` to update legislative data.
 
@@ -74,5 +74,3 @@ Then `heroku run ./manage.py update_index`
 
 
 
-
-Copyright (c) 2019 Participatory Politics Foundation and DataMade. Released under the [MIT License](https://github.com/datamade/councilmatic-starter-template/blob/master/LICENSE).
