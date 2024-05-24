@@ -6,6 +6,8 @@ The council scraper and the django site work well, but not perfectly. There are 
 
 It may be that some amount of manual tending is necessary for this app to work exactly right. There are many odd things that happen with legilsative data. A Council Person's name may be spelled with a ' character sometimes and a smart-quote other times, for example, or misspelled, or with or without middle names, or many other odd variations that software would have a hard time keeping up with. 
 
+There is no mechanism for auto-updating scraper data so far. As of now, someone needs to manually run `pupa update` to update legislative data.
+
 
 ## Running in development
 
@@ -69,7 +71,6 @@ This step takes a long time, and may even fail if takes too long or too much mem
 
 Then `heroku run pupa update philadelphia_scraper`.
 Then `heroku run ./manage.py update_index`
-
 
 
 
